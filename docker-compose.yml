@@ -37,6 +37,24 @@ services:
       - ./datos:/datos:ro     # Aquí van los CSV del ERP
       - ./sql:/app/sql:ro     # Funciones de carga (06_funciones_ingesta.sql)
       - ./ingesta/ingesta.py:/app/ingesta.py:ro # para no tener que hacer build de ingesta todo el rato
+  
+  # Panel de seguimiento (lee solo el esquema de consume). Arranca con "up": http://localhost:8501
+  panel:
+    build: ./panel
+    container_name: aurora_market_panel
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGDATABASE: aurora_market
+      PGUSER: aurora
+      PGPASSWORD: aurora
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./panel/app.py:/app/app.py:ro # sin reconstruir la imagen al cambiar el panel
 
 volumes:
   datos_pg:

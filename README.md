@@ -13,6 +13,11 @@ sql/
   04_consume.sql            Estrella (fact_ventas + dimensiones) y resultados analíticos
   05_datos_referencia.sql   Catálogos, mapeos, reglas, registros -1 y calendario
   06_funciones_ingesta.sql  Funciones SQL de carga staging -> core (una por entidad)
+  07_informe_calidad.sql    Vistas del informe de calidad antes/después y resumen por regla
+  08_procesamiento.sql      Función consume.refrescar(): 360, RFM, recomendaciones, audiencia
+panel/
+  app.py                    Panel de seguimiento (Streamlit), lee solo del esquema consume
+  Dockerfile                Imagen del panel
 ingesta/
   ingesta.py                Orquestador: hash, COPY a staging, llamada a las funciones, registro
   Dockerfile                Imagen del proceso de ingesta (Python 3.12 + psycopg)
@@ -141,6 +146,46 @@ tras cada carga tantas veces como se quiera (mismo resultado).
    co-compra ("quien compró X también compró Y").
 10. Audiencia: solo consentimiento explícito; el consentimiento desconocido queda fuera.
 
+## Panel de seguimiento
+
+Arranca con `docker compose up -d` junto a la base de datos: **http://localhost:8501**.
+Si se abre antes de cargar y procesar los datos, se vacía: basta con recargar la página tras
+`procesar` (los datos se guardan en caché 5 minutos).
+
+Lee únicamente de la capa de consumo (`consume`), nunca de los CSV ni de `core`. Contiene:
+
+- Indicadores generales: clientes, clientes con compras, pedidos entregados, ingresos y contactables.
+- Distribución de clientes por segmento (con su peso en el importe al pasar el ratón).
+- Evolución mensual de las ventas por canal.
+- Peso de cada categoría en el gasto de cada segmento y productos más vendidos por segmento.
+- Filtro por país (sirve para la expansión a nuevos mercados).
+
+Elegí Streamlit frente a una herramienta de BI (Metabase, Superset) porque el panel es código
+dentro del proyecto: se reproduce con un comando, sin configurar gráficos a mano.
+
+## Escalabilidad y evolución futura
+
+El diseño (capas, modelo, reglas en tablas, trazabilidad, idempotencia) se mantiene en todos
+los escenarios; lo que cambia es la tecnología de cada pieza.
+
+| Escenario | Se mantiene | Cambia |
+|---|---|---|
+| Volumen x100 (500 k clientes, 10 M líneas) | COPY + SQL de conjuntos, idempotencia por hash, capas | Consumo incremental (solo lo cambiado desde la última `id_ejecucion`) en vez de reconstruir; particionar y purgar `staging` e incidencias; si crece la analítica, almacén columnar (BigQuery/Snowflake) con la lógica en dbt |
+| Nuevas fuentes (CRM, web, email) | Capas, `control`, reglas de calidad | `cliente_id_erp` → `cliente_id_origen (sistema, id)`; hechos nuevos (`fact_eventos_web`, `fact_envios_email`); las bajas de la plataforma de correo actualizan el consentimiento |
+| Frecuencia diaria / horaria / tiempo real | Diaria: igual, con un planificador (cron, Airflow) | Horaria: consumo incremental. Tiempo real: CDC del ERP (Debezium) o eventos (Kafka). El RFM basta con diario; la retirada del consentimiento debería ser inmediata |
+| Previsión de demanda, precios dinámicos | `fact_ventas` por línea + `dim_fecha` | Historial de precios y costes (SCD2 en producto); stock y datos externos |
+| Nuevos países | Añadir país = insertar filas en `core.pais` y `control.mapeo_valores` | Moneda + tipos de cambio; traducciones; consentimiento por país y canal; residencia del dato; `TIMESTAMPTZ`; teléfono en formato internacional (E.164) para la deduplicación |
+
+**Limitaciones actuales**
+
+1. La fecha de un cambio de estado es la de la carga (el ERP no la informa).
+2. El margen usa el coste actual del producto, no el del momento de la venta.
+3. Deduplicación por coincidencia exacta: no detecta erratas en el teléfono ni tiene revisión manual.
+4. Recomendaciones por popularidad en la categoría; sin co-compra ni medición de efectividad.
+5. Los registros en cuarentena se revisan y reprocesan a mano.
+6. El orden de los ficheros importa: un delta antiguo cargado después de uno nuevo revertiría cambios.
+7. El consentimiento desconocido se excluye por prudencia (430 clientes fuera de las audiencias).
+8. Sin planificador, alertas ni integración continua; credenciales en el `docker-compose.yml`.
 
 ## Pruebas
 
@@ -186,3 +231,4 @@ Venta = pedido entregado; recencia contra la fecha del último pedido | Métrica
 | Reglas de segmento en una tabla | Marketing puede ajustar criterios sin tocar código |
 | Recomendación por categoría favorita | Explicable y barata; la co-compra queda como evolución |
 | Audiencia solo con consentimiento explícito y email | Cumplimiento: 2.514 de 5.120 clientes son contactables |
+| Panel en Streamlit sobre la capa de consumo | Reproducible desde el código y se levanta con el resto de servicios |
