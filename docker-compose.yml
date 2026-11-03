@@ -12,6 +12,30 @@ services:
       # Los scripts son ejecutados en orden alfabético al crear el contenedor por primera vez
       - ./sql:/docker-entrypoint-initdb.d:ro
       - datos_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aurora -d aurora_market"]
+      interval: 5s
+      retries: 10
+
+  # Proceso de ingesta. No arranca con "up": se lanza a demanda con
+  # docker compose run --rm ingesta inicial
+  # docker compose run --rm ingesta delta
+  ingesta:
+    build: ./ingesta
+    profiles: ["ingesta"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGDATABASE: aurora_market
+      PGUSER: aurora
+      PGPASSWORD: aurora
+      DATOS_DIR: /datos
+    volumes:
+      - ./datos:/datos:ro     # Aquí van los CSV del ERP
+      - ./sql:/app/sql:ro     # Funciones de carga (06_funciones_ingesta.sql)
 
 volumes:
   datos_pg:

@@ -1,0 +1,403 @@
+id_producto,nombre,categoria,subcategoria,marca,precio_lista,coste,activo
+P00001,Cocina Lumen 328,Hogar,Cocina,Kiro,5.74,3.55,1
+P00002,Cocina Aurea 323,Hogar,Cocina,Lumen,64.46,29.43,1
+P00003,Iluminación Terra 928,Hogar,Iluminación,Norte,20.39,9.99,1
+P00004,Textil hogar Vento 204,Hogar,Textil hogar,Aurea,13.16,7.1,1
+P00005,Textil hogar Silva 227,Hogar,Textil hogar,Pico,5.71,2.99,1
+P00006,Textil hogar Norte 777,Hogar,Textil hogar,Lumen,22.93,15.97,1
+P00007,Cocina Vento 266,Hogar,Cocina,Vento,74.18,45.81,1
+P00008,Cocina Lumen 267,Hogar,Cocina,Orbe,15.47,10.79,1
+P00009,Decoración Norte 334,Hogar,Decoración,Norte,59.85,32.93,1
+P00010,Textil hogar Pico 758,Hogar,Textil hogar,Orbe,22.44,10.88,1
+P00011,Textil hogar Pico 470,Hogar,Textil hogar,Lumen,98.66,47.81,1
+P00012,Cocina Kiro 911,Hogar,Cocina,Pico,8.68,4.74,1
+P00013,Iluminación Silva 981,Hogar,Iluminación,Norte,230.5,110.33,1
+P00014,Textil hogar Pico 261,Hogar,Textil hogar,Orbe,,26.44,1
+P00015,Decoración Terra 961,Hogar,Decoración,Silva,312.82,152.72,1
+P00016,Cocina Aurea 471,Hogar,Cocina,Terra,51.17,26.11,1
+P00017,Cocina Aurea 878,Hogar,Cocina,Silva,11.54,5.56,1
+P00018,Decoración Zenit 533,Hogar,Decoración,Lumen,31.81,20.32,1
+P00019,Textil hogar Vento 548,Hogar,Textil hogar,Silva,102.51,52.48,1
+P00020,Cocina Lumen 107,Hogar,Cocina,Aurea,227.85,105.89,1
+P00021,Cocina Lumen 385,Hogar,Cocina,Orbe,40.94,19.78,1
+P00022,Iluminación Pico 294,Hogar,Iluminación,Aurea,23.73,13.24,1
+P00023,Iluminación Aurea 162,Hogar,Iluminación,Pico,5.57,3.62,1
+P00024,Decoración Kiro 532,Hogar,Decoración,Kiro,21.26,10.89,1
+P00025,Iluminación Silva 956,Hogar,Iluminación,Norte,211.39,144.08,1
+P00026,Decoración Lumen 985,Hogar,Decoración,Pico,82.38,40.46,1
+P00027,Iluminación Orbe 392,Hogar,Iluminación,Pico,37.77,23.89,1
+P00028,Iluminación Lumen 159,Hogar,Iluminación,Zenit,12.98,6.04,1
+P00029,Cocina Silva 261,Hogar,Cocina,Norte,135.63,63.75,1
+P00030,Cocina Zenit 352,Hogar,Cocina,Zenit,19.94,12.06,1
+P00031,Textil hogar Vento 344,Hogar,Textil hogar,Terra,26.97,16.67,1
+P00032,Textil hogar Zenit 676,Hogar,Textil hogar,Aurea,7.97,4.01,1
+P00033,Textil hogar Vento 391,Hogar,Textil hogar,Kiro,12.27,7.19,1
+P00034,Cocina Aurea 999,Hogar,Cocina,Kiro,236.47,159.01,1
+P00035,Decoración Lumen 834,Hogar,Decoración,Vento,28.13,17.12,1
+P00036,Iluminación Norte 194,Hogar,Iluminación,Pico,37.45,17.27,1
+P00037,Decoración Orbe 664,Hogar,Decoración,Pico,26.34,12.59,1
+P00038,Decoración Vento 696,Hogar,Decoración,Silva,203.69,98.15,1
+P00039,Cocina Lumen 782,Hogar,Cocina,Aurea,44.35,26.17,1
+P00040,Decoración Kiro 522,Hogar,Decoración,Norte,24.52,16.7,1
+P00041,Iluminación Aurea 491,Hogar,Iluminación,Norte,18.57,9.39,1
+P00042,Iluminación Lumen 328,Hogar,Iluminación,Norte,46.68,25.66,1
+P00043,Cocina Silva 509,Hogar,Cocina,Silva,29.17,13.33,1
+P00044,Textil hogar Terra 139,Hogar,Textil hogar,Aurea,15.81,8.48,1
+P00045,Iluminación Zenit 294,Hogar,Iluminación,Terra,213.6,119.41,1
+P00046,Decoración Vento 738,Hogar,Decoración,Vento,49.77,23.95,1
+P00047,Textil hogar Terra 667,Hogar,Textil hogar,Kiro,76.08,46.88,1
+P00048,Decoración Norte 411,Hogar,Decoración,Terra,29.99,19.39,1
+P00049,Textil hogar Lumen 623,Hogar,Textil hogar,Orbe,131.7,90.87,1
+P00050,Cocina Zenit 443,Hogar,Cocina,Aurea,31.63,20.17,1
+P00051,Decoración Norte 350,Hogar,Decoración,Orbe,17.39,11.17,1
+P00052,Decoración Lumen 251,Hogar,Decoración,Norte,82.73,55.02,1
+P00053,Iluminación Silva 575,Hogar,Iluminación,Norte,17.67,12.0,1
+P00054,Decoración Silva 709,Hogar,Decoración,Vento,146.26,98.41,1
+P00055,Iluminación Kiro 861,Hogar,Iluminación,Orbe,254.72,162.5,1
+P00056,Textil hogar Lumen 381,Hogar,Textil hogar,Orbe,259.53,135.33,1
+P00057,Textil hogar Kiro 336,Hogar,Textil hogar,Pico,209.23,131.1,1
+P00058,Iluminación Pico 163,Hogar,Iluminación,Lumen,52.49,28.73,1
+P00059,Cocina Vento 405,Hogar,Cocina,Pico,82.04,56.47,1
+P00060,Decoración Pico 597,Hogar,Decoración,Norte,117.35,72.43,1
+P00061,Decoración Zenit 646,Hogar,Decoración,Norte,162.51,97.18,1
+P00062,Cocina Orbe 286,Hogar,Cocina,Norte,68.56,36.46,1
+P00063,Textil hogar Pico 358,Hogar,Textil hogar,Aurea,74.19,47.28,1
+P00064,Textil hogar Norte 872,Hogar,Textil hogar,Norte,22.39,11.19,1
+P00065,Decoración Aurea 677,Hogar,Decoración,Lumen,17.18,8.83,1
+P00066,Cocina Aurea 692,Hogar,Cocina,Norte,18.59,11.04,1
+P00067,Iluminación Lumen 177,Hogar,Iluminación,Zenit,100.39,60.92,1
+P00068,Smart home Zenit 901,Electrónica,Smart home,Norte,11.86,6.61,1
+P00069,Smart home Orbe 208,Electrónica,Smart home,Pico,6.0,3.65,1
+P00070,Informática Silva 766,Electrónica,Informática,Terra,70.16,47.7,1
+P00071,Accesorios móvil Zenit 374,Electrónica,Accesorios móvil,Vento,95.82,63.02,1
+P00072,Accesorios móvil Zenit 724,Electrónica,Accesorios móvil,Pico,23.39,13.42,1
+P00073,Accesorios móvil Terra 448,Electrónica,Accesorios móvil,Terra,19.45,12.16,1
+P00074,Audio Aurea 347,Electrónica,Audio,Pico,317.23,202.88,1
+P00075,Accesorios móvil Aurea 401,Electrónica,Accesorios móvil,Lumen,154.34,78.84,1
+P00076,Smart home Vento 535,Electrónica,Smart home,Silva,138.9,86.91,1
+P00077,Smart home Lumen 423,Electrónica,Smart home,Aurea,17.12,11.77,1
+P00078,Informática Terra 841,Electrónica,Informática,Zenit,23.27,13.52,1
+P00079,Audio Vento 283,Electrónica,Audio,Terra,18.87,11.01,1
+P00080,Audio Kiro 753,Electrónica,Audio,Orbe,235.57,106.73,1
+P00081,Accesorios móvil Norte 358,Electrónica,Accesorios móvil,Orbe,125.18,58.38,1
+P00082,Audio Zenit 411,Electrónica,Audio,Aurea,12.68,6.08,1
+P00083,Informática Orbe 404,Electrónica,Informática,Zenit,246.56,129.78,1
+P00084,Audio Terra 776,Electrónica,Audio,Aurea,22.14,10.93,1
+P00085,Audio Zenit 581,Electrónica,Audio,Terra,80.99,42.28,1
+P00086,Accesorios móvil Terra 906,Electrónica,Accesorios móvil,Zenit,11.32,7.74,1
+P00087,Informática Kiro 173,Electrónica,Informática,Norte,18.19,9.58,1
+P00088,Smart home Terra 816,Electrónica,Smart home,Pico,111.22,63.96,1
+P00089,Audio Vento 718,Electrónica,Audio,Terra,6.1,3.09,1
+P00090,Audio Kiro 581,Electrónica,Audio,Silva,32.53,22.09,1
+P00091,Accesorios móvil Orbe 456,Electrónica,Accesorios móvil,Pico,165.7,102.33,1
+P00092,Smart home Terra 778,Electrónica,Smart home,Pico,90.6,53.23,1
+P00093,Smart home Pico 985,Electrónica,Smart home,Silva,28.75,12.95,1
+P00094,Accesorios móvil Silva 470,Electrónica,Accesorios móvil,Zenit,65.34,39.62,1
+P00095,Informática Terra 548,Electrónica,Informática,Orbe,32.13,22.28,1
+P00096,Informática Norte 665,Electrónica,Informática,Pico,13.85,9.67,1
+P00097,Accesorios móvil Kiro 610,Electrónica,Accesorios móvil,Terra,11.13,5.77,1
+P00098,Accesorios móvil Kiro 492,Electrónica,Accesorios móvil,Lumen,20.47,11.81,1
+P00099,Audio Pico 448,Electrónica,Audio,Silva,35.47,15.98,1
+P00100,Accesorios móvil Orbe 453,Electrónica,Accesorios móvil,Vento,14.84,8.69,1
+P00101,Smart home Lumen 685,Electrónica,Smart home,Pico,25.68,16.53,1
+P00102,Accesorios móvil Kiro 607,Electrónica,Accesorios móvil,Norte,78.45,54.24,1
+P00103,Audio Orbe 115,Electrónica,Audio,Kiro,109.63,67.28,1
+P00104,Accesorios móvil Pico 765,Electrónica,Accesorios móvil,Aurea,28.98,19.22,1
+P00105,Accesorios móvil Orbe 993,Electrónica,Accesorios móvil,Silva,54.56,25.49,1
+P00106,Smart home Pico 200,Electrónica,Smart home,Aurea,23.35,14.56,1
+P00107,Audio Terra 467,Electrónica,Audio,Vento,58.71,30.0,1
+P00108,Informática Zenit 991,Electrónica,Informática,Pico,12.87,6.57,1
+P00109,Informática Terra 570,Electrónica,Informática,Terra,20.51,13.84,1
+P00110,Smart home Orbe 453,Electrónica,Smart home,Zenit,218.87,151.13,1
+P00111,Accesorios móvil Pico 973,Electrónica,Accesorios móvil,Orbe,26.9,14.67,1
+P00112,Smart home Pico 381,Electrónica,Smart home,Norte,24.25,15.07,1
+P00113,Audio Terra 894,Electrónica,Audio,Lumen,156.92,84.44,1
+P00114,Smart home Norte 416,Electrónica,Smart home,Orbe,16.15,8.74,1
+P00115,Smart home Kiro 305,Electrónica,Smart home,Kiro,57.51,38.48,1
+P00116,Smart home Orbe 925,Electrónica,Smart home,Terra,13.46,7.2,1
+P00117,Audio Lumen 980,Electrónica,Audio,Pico,17.07,11.12,1
+P00118,Accesorios móvil Aurea 565,Electrónica,Accesorios móvil,Vento,4.57,2.82,1
+P00119,Smart home Orbe 125,Electrónica,Smart home,Zenit,11.26,6.65,1
+P00120,Informática Orbe 817,Electrónica,Informática,Terra,11.07,5.3,1
+P00121,Audio Aurea 199,Electrónica,Audio,Lumen,38.81,18.78,1
+P00122,Accesorios móvil Aurea 953,Electrónica,Accesorios móvil,Orbe,18.02,12.34,1
+P00123,Smart home Lumen 975,Electrónica,Smart home,Vento,20.33,12.63,1
+P00124,Smart home Lumen 225,Electrónica,Smart home,Orbe,4.9,2.46,1
+P00125,Audio Lumen 228,Electrónica,Audio,Zenit,5.85,3.85,1
+P00126,Informática Kiro 907,Electrónica,Informática,Zenit,,12.75,1
+P00127,Informática Kiro 212,Electrónica,Informática,Norte,230.41,124.32,1
+P00128,Smart home Norte 229,Electrónica,Smart home,Pico,4.35,2.77,1
+P00129,Smart home Orbe 615,Electrónica,Smart home,Lumen,273.11,125.86,1
+P00130,Smart home Norte 162,Electrónica,Smart home,Orbe,144.7,80.54,1
+P00131,Accesorios móvil Vento 722,Electrónica,Accesorios móvil,Kiro,12.37,6.42,1
+P00132,Smart home Silva 401,Electrónica,Smart home,Orbe,102.49,57.14,1
+P00133,Audio Lumen 540,Electrónica,Audio,Orbe,288.94,159.91,1
+P00134,Accesorios móvil Vento 537,Electrónica,Accesorios móvil,Vento,92.02,50.02,1
+P00135,Outdoor Aurea 195,Deporte,Outdoor,Pico,8.37,5.31,1
+P00136,Running Aurea 520,Deporte,Running,Vento,269.13,184.43,1
+P00137,Running Vento 206,Deporte,Running,Zenit,32.9,16.08,1
+P00138,Running Vento 217,Deporte,Running,Terra,59.91,39.05,1
+P00139,Running Terra 819,Deporte,Running,Terra,24.35,13.09,1
+P00140,Fitness Norte 193,Deporte,Fitness,Silva,65.95,36.6,1
+P00141,Ciclismo Zenit 710,Deporte,Ciclismo,Aurea,34.71,16.97,1
+P00142,Running Pico 597,Deporte,Running,Zenit,9.27,4.8,1
+P00143,Running Terra 794,Deporte,Running,Zenit,49.73,30.67,1
+P00144,Outdoor Terra 316,Deporte,Outdoor,Kiro,3.94,2.06,1
+P00145,Outdoor Pico 645,Deporte,Outdoor,Lumen,70.14,46.18,1
+P00146,Running Norte 546,Deporte,Running,Norte,97.24,45.65,1
+P00147,Outdoor Pico 396,Deporte,Outdoor,Aurea,91.23,63.09,1
+P00148,Outdoor Aurea 349,Deporte,Outdoor,Pico,41.36,24.03,1
+P00149,Ciclismo Kiro 178,Deporte,Ciclismo,Silva,44.63,26.0,1
+P00150,Ciclismo Kiro 341,Deporte,Ciclismo,Aurea,57.02,28.47,1
+P00151,Running Orbe 575,Deporte,Running,Zenit,18.5,10.4,1
+P00152,Ciclismo Aurea 580,Deporte,Ciclismo,Orbe,42.9,27.85,1
+P00153,Ciclismo Orbe 562,Deporte,Ciclismo,Norte,208.44,137.14,1
+P00154,Running Zenit 667,Deporte,Running,Norte,247.07,161.2,1
+P00155,Ciclismo Norte 561,Deporte,Ciclismo,Aurea,135.54,89.37,0
+P00156,Running Norte 353,Deporte,Running,Orbe,279.64,162.48,1
+P00157,Ciclismo Pico 518,Deporte,Ciclismo,Vento,61.69,28.57,1
+P00158,Ciclismo Silva 794,Deporte,Ciclismo,Pico,9.55,6.03,1
+P00159,Fitness Kiro 458,Deporte,Fitness,Terra,41.2,25.73,1
+P00160,Running Vento 932,Deporte,Running,Kiro,32.28,21.22,1
+P00161,Running Norte 471,Deporte,Running,Terra,83.29,41.94,1
+P00162,Outdoor Kiro 258,Deporte,Outdoor,Aurea,18.17,11.76,1
+P00163,Running Zenit 234,Deporte,Running,Zenit,60.67,29.76,1
+P00164,Fitness Vento 792,Deporte,Fitness,Lumen,106.02,63.89,1
+P00165,Outdoor Terra 928,Deporte,Outdoor,Orbe,21.23,10.58,1
+P00166,Outdoor Pico 614,Deporte,Outdoor,Silva,152.83,74.97,1
+P00167,Fitness Orbe 995,Deporte,Fitness,Vento,24.7,11.75,1
+P00168,Running Kiro 379,Deporte,Running,Orbe,25.17,12.25,1
+P00169,Fitness Norte 524,Deporte,Fitness,Norte,160.26,87.1,1
+P00170,Running Vento 201,Deporte,Running,Vento,44.7,21.65,1
+P00171,Outdoor Orbe 559,Deporte,Outdoor,Zenit,,8.03,1
+P00172,Fitness Zenit 640,Deporte,Fitness,Pico,316.26,165.1,1
+P00173,Running Zenit 568,Deporte,Running,Aurea,20.1,13.59,1
+P00174,Running Kiro 398,Deporte,Running,Pico,,145.74,1
+P00175,Fitness Vento 169,Deporte,Fitness,Silva,10.51,6.8,1
+P00176,Running Norte 750,Deporte,Running,Pico,97.7,50.16,1
+P00177,Running Aurea 890,Deporte,Running,Zenit,45.11,24.05,1
+P00178,Ciclismo Orbe 812,Deporte,Ciclismo,Orbe,17.62,11.5,1
+P00179,Outdoor Norte 910,Deporte,Outdoor,Lumen,4.64,2.45,1
+P00180,Outdoor Norte 871,Deporte,Outdoor,Lumen,258.14,171.8,1
+P00181,Ciclismo Vento 547,Deporte,Ciclismo,Pico,25.78,17.37,1
+P00182,Fitness Vento 916,Deporte,Fitness,Silva,147.84,69.58,1
+P00183,Outdoor Vento 205,Deporte,Outdoor,Aurea,15.55,8.15,1
+P00184,Outdoor Vento 557,Deporte,Outdoor,Norte,16.6,11.25,1
+P00185,Outdoor Norte 176,Deporte,Outdoor,Pico,33.48,21.77,1
+P00186,Running Orbe 135,Deporte,Running,Kiro,17.75,11.44,1
+P00187,Outdoor Orbe 479,Deporte,Outdoor,Vento,5.4,2.53,1
+P00188,Ciclismo Terra 355,Deporte,Ciclismo,Aurea,75.62,37.55,1
+P00189,Running Orbe 319,Deporte,Running,Zenit,35.51,24.12,1
+P00190,Running Orbe 276,Deporte,Running,Orbe,17.78,11.6,0
+P00191,Ciclismo Silva 655,Deporte,Ciclismo,Terra,56.58,37.5,1
+P00192,Fitness Aurea 305,Deporte,Fitness,Kiro,51.66,29.63,1
+P00193,Ciclismo Silva 232,Deporte,Ciclismo,Zenit,155.04,72.32,1
+P00194,Outdoor Pico 943,Deporte,Outdoor,Zenit,250.34,173.51,1
+P00195,Outdoor Vento 231,Deporte,Outdoor,Silva,147.07,72.87,0
+P00196,Outdoor Norte 951,Deporte,Outdoor,Aurea,312.58,164.43,1
+P00197,Fitness Silva 390,Deporte,Fitness,Aurea,62.41,37.99,1
+P00198,Fitness Aurea 614,Deporte,Fitness,Kiro,33.11,19.71,1
+P00199,Ciclismo Norte 183,Deporte,Ciclismo,Norte,5.94,3.82,1
+P00200,Fitness Norte 609,Deporte,Fitness,Silva,87.62,60.38,1
+P00201,Outdoor Norte 261,Deporte,Outdoor,Orbe,30.7,17.38,1
+P00202,Calzado Vento 851,Moda,Calzado,Vento,60.31,29.11,1
+P00203,Camisetas Aurea 373,Moda,Camisetas,Orbe,45.12,21.4,1
+P00204,Complementos Kiro 933,Moda,Complementos,Vento,73.01,46.02,1
+P00205,Calzado Orbe 610,Moda,Calzado,Terra,167.44,79.12,1
+P00206,Complementos Vento 149,Moda,Complementos,Norte,18.06,10.82,1
+P00207,Complementos Aurea 541,Moda,Complementos,Kiro,31.94,20.18,1
+P00208,Abrigos Zenit 675,Moda,Abrigos,Lumen,4.9,2.56,1
+P00209,Complementos Zenit 796,Moda,Complementos,Zenit,234.03,162.36,1
+P00210,Abrigos Kiro 303,Moda,Abrigos,Zenit,316.1,181.76,1
+P00211,Calzado Silva 567,Moda,Calzado,Kiro,58.9,34.1,1
+P00212,Abrigos Zenit 857,Moda,Abrigos,Terra,14.45,8.34,1
+P00213,Complementos Norte 477,Moda,Complementos,Vento,31.02,21.56,1
+P00214,Camisetas Zenit 691,Moda,Camisetas,Lumen,120.33,71.7,1
+P00215,Complementos Lumen 132,Moda,Complementos,Zenit,17.56,8.38,1
+P00216,Abrigos Lumen 520,Moda,Abrigos,Silva,69.18,47.05,1
+P00217,Camisetas Silva 432,Moda,Camisetas,Orbe,15.36,8.12,1
+P00218,Abrigos Terra 724,Moda,Abrigos,Orbe,243.31,124.48,1
+P00219,Calzado Lumen 806,Moda,Calzado,Orbe,35.45,19.04,1
+P00220,Abrigos Silva 488,Moda,Abrigos,Pico,25.74,17.73,1
+P00221,Abrigos Aurea 454,Moda,Abrigos,Orbe,4.62,2.94,1
+P00222,Abrigos Kiro 211,Moda,Abrigos,Zenit,285.87,145.74,1
+P00223,Calzado Pico 438,Moda,Calzado,Orbe,16.44,10.57,1
+P00224,Calzado Orbe 588,Moda,Calzado,Lumen,88.99,46.44,1
+P00225,Camisetas Lumen 647,Moda,Camisetas,Norte,11.15,5.51,1
+P00226,Calzado Pico 906,Moda,Calzado,Orbe,6.36,4.05,1
+P00227,Abrigos Zenit 717,Moda,Abrigos,Aurea,3.94,2.1,1
+P00228,Complementos Orbe 379,Moda,Complementos,Lumen,17.77,9.47,1
+P00229,Abrigos Vento 909,Moda,Abrigos,Terra,11.7,7.48,1
+P00230,Complementos Aurea 510,Moda,Complementos,Aurea,83.55,40.53,1
+P00231,Calzado Lumen 557,Moda,Calzado,Terra,4.56,2.4,1
+P00232,Camisetas Lumen 163,Moda,Camisetas,Aurea,33.69,16.51,1
+P00233,Abrigos Terra 476,Moda,Abrigos,Zenit,11.08,7.64,1
+P00234,Complementos Silva 582,Moda,Complementos,Silva,49.39,32.42,1
+P00235,Camisetas Vento 179,Moda,Camisetas,Zenit,254.82,167.47,1
+P00236,Calzado Vento 974,Moda,Calzado,Silva,217.86,135.09,1
+P00237,Complementos Orbe 928,Moda,Complementos,Norte,12.37,7.15,1
+P00238,Camisetas Terra 840,Moda,Camisetas,Norte,256.77,167.96,1
+P00239,Camisetas Aurea 654,Moda,Camisetas,Norte,4.96,2.32,1
+P00240,Camisetas Kiro 884,Moda,Camisetas,Pico,30.03,20.21,1
+P00241,Complementos Silva 236,Moda,Complementos,Vento,66.37,46.34,1
+P00242,Calzado Norte 405,Moda,Calzado,Orbe,24.23,14.2,1
+P00243,Calzado Kiro 382,Moda,Calzado,Lumen,20.5,12.94,1
+P00244,Complementos Aurea 203,Moda,Complementos,Zenit,4.51,2.7,1
+P00245,Camisetas Pico 549,Moda,Camisetas,Lumen,23.29,14.87,1
+P00246,Calzado Lumen 935,Moda,Calzado,Zenit,322.89,193.57,1
+P00247,Abrigos Kiro 776,Moda,Abrigos,Silva,18.92,9.94,1
+P00248,Calzado Norte 452,Moda,Calzado,Pico,85.16,45.11,1
+P00249,Calzado Silva 584,Moda,Calzado,Lumen,29.55,15.52,1
+P00250,Complementos Pico 670,Moda,Complementos,Silva,5.3,2.71,1
+P00251,Camisetas Aurea 648,Moda,Camisetas,Lumen,157.84,85.91,1
+P00252,Camisetas Zenit 841,Moda,Camisetas,Silva,8.85,4.44,1
+P00253,Abrigos Lumen 859,Moda,Abrigos,Aurea,4.44,2.84,1
+P00254,Calzado Silva 429,Moda,Calzado,Terra,99.35,57.96,1
+P00255,Abrigos Orbe 577,Moda,Abrigos,Aurea,51.76,32.64,1
+P00256,Abrigos Pico 146,Moda,Abrigos,Zenit,19.61,12.46,1
+P00257,Complementos Vento 335,Moda,Complementos,Pico,26.2,13.4,1
+P00258,Abrigos Orbe 840,Moda,Abrigos,Orbe,35.33,22.37,1
+P00259,Calzado Silva 757,Moda,Calzado,Norte,260.0,171.54,1
+P00260,Camisetas Lumen 169,Moda,Camisetas,Kiro,,2.84,1
+P00261,Complementos Silva 664,Moda,Complementos,Pico,104.21,60.69,1
+P00262,Abrigos Pico 925,Moda,Abrigos,Kiro,5.15,2.44,1
+P00263,Calzado Vento 373,Moda,Calzado,Pico,230.63,159.09,1
+P00264,Calzado Aurea 769,Moda,Calzado,Norte,18.9,10.3,1
+P00265,Camisetas Aurea 611,Moda,Camisetas,Pico,5.64,3.01,0
+P00266,Camisetas Lumen 316,Moda,Camisetas,Zenit,313.63,144.78,1
+P00267,Abrigos Norte 283,Moda,Abrigos,Vento,269.36,135.16,1
+P00268,Complementos Zenit 346,Moda,Complementos,Zenit,9.4,5.14,1
+P00269,Café y té Kiro 909,Gourmet,Café y té,Aurea,93.05,64.54,1
+P00270,Dulces Vento 719,Gourmet,Dulces,Zenit,24.26,13.32,1
+P00271,Aceites Orbe 602,Gourmet,Aceites,Lumen,35.63,24.42,1
+P00272,Dulces Terra 917,Gourmet,Dulces,Lumen,11.74,5.52,1
+P00273,Conservas Aurea 193,Gourmet,Conservas,Norte,75.71,42.49,1
+P00274,Aceites Pico 559,Gourmet,Aceites,Silva,12.23,6.75,1
+P00275,Café y té Zenit 903,Gourmet,Café y té,Vento,210.79,95.51,1
+P00276,Aceites Lumen 685,Gourmet,Aceites,Silva,311.9,170.04,1
+P00277,Café y té Aurea 271,Gourmet,Café y té,Pico,31.29,16.43,1
+P00278,Café y té Orbe 708,Gourmet,Café y té,Zenit,38.04,18.14,1
+P00279,Dulces Pico 923,Gourmet,Dulces,Vento,59.82,33.36,1
+P00280,Conservas Lumen 590,Gourmet,Conservas,Vento,28.71,15.78,1
+P00281,Dulces Terra 936,Gourmet,Dulces,Pico,19.16,13.09,1
+P00282,Conservas Orbe 825,Gourmet,Conservas,Lumen,202.55,105.9,1
+P00283,Dulces Terra 347,Gourmet,Dulces,Terra,112.18,70.54,1
+P00284,Aceites Orbe 696,Gourmet,Aceites,Pico,167.1,113.77,1
+P00285,Dulces Vento 818,Gourmet,Dulces,Silva,203.78,138.29,1
+P00286,Conservas Zenit 145,Gourmet,Conservas,Zenit,43.28,26.81,1
+P00287,Café y té Aurea 364,Gourmet,Café y té,Lumen,67.38,39.06,1
+P00288,Conservas Orbe 890,Gourmet,Conservas,Zenit,127.33,62.1,0
+P00289,Dulces Aurea 218,Gourmet,Dulces,Kiro,9.38,5.03,1
+P00290,Dulces Orbe 839,Gourmet,Dulces,Orbe,50.87,26.71,1
+P00291,Aceites Aurea 793,Gourmet,Aceites,Kiro,6.0,3.81,1
+P00292,Conservas Orbe 337,Gourmet,Conservas,Pico,52.92,26.28,1
+P00293,Dulces Lumen 560,Gourmet,Dulces,Zenit,5.73,2.58,1
+P00294,Café y té Silva 291,Gourmet,Café y té,Vento,10.78,6.08,1
+P00295,Dulces Vento 711,Gourmet,Dulces,Pico,319.46,190.64,1
+P00296,Dulces Terra 729,Gourmet,Dulces,Zenit,17.5,8.46,1
+P00297,Café y té Kiro 623,Gourmet,Café y té,Pico,8.83,4.28,1
+P00298,Conservas Kiro 668,Gourmet,Conservas,Kiro,144.19,69.94,1
+P00299,Dulces Norte 596,Gourmet,Dulces,Kiro,6.04,3.3,1
+P00300,Dulces Pico 827,Gourmet,Dulces,Orbe,90.25,42.48,1
+P00301,Conservas Lumen 650,Gourmet,Conservas,Terra,24.41,13.78,1
+P00302,Dulces Zenit 216,Gourmet,Dulces,Terra,262.8,172.35,1
+P00303,Aceites Pico 204,Gourmet,Aceites,Lumen,138.44,96.88,1
+P00304,Café y té Aurea 894,Gourmet,Café y té,Lumen,10.09,6.4,1
+P00305,Dulces Lumen 933,Gourmet,Dulces,Lumen,16.07,9.52,1
+P00306,Conservas Terra 396,Gourmet,Conservas,Zenit,63.19,41.99,0
+P00307,Aceites Pico 160,Gourmet,Aceites,Terra,18.58,8.95,1
+P00308,Conservas Lumen 879,Gourmet,Conservas,Pico,16.76,9.96,1
+P00309,Dulces Aurea 512,Gourmet,Dulces,Silva,81.05,50.55,1
+P00310,Dulces Norte 989,Gourmet,Dulces,Aurea,124.31,70.19,1
+P00311,Café y té Pico 323,Gourmet,Café y té,Pico,11.86,6.8,1
+P00312,Café y té Kiro 679,Gourmet,Café y té,Orbe,52.61,35.43,1
+P00313,Aceites Orbe 116,Gourmet,Aceites,Aurea,11.02,5.39,1
+P00314,Dulces Kiro 765,Gourmet,Dulces,Terra,25.83,17.65,1
+P00315,Café y té Kiro 153,Gourmet,Café y té,Pico,25.15,15.88,1
+P00316,Dulces Norte 318,Gourmet,Dulces,Orbe,11.4,6.82,1
+P00317,Dulces Vento 936,Gourmet,Dulces,Aurea,3.94,2.19,1
+P00318,Aceites Aurea 205,Gourmet,Aceites,Vento,19.73,10.35,1
+P00319,Conservas Zenit 108,Gourmet,Conservas,Zenit,12.1,6.78,1
+P00320,Conservas Orbe 980,Gourmet,Conservas,Lumen,87.54,41.59,1
+P00321,Dulces Vento 910,Gourmet,Dulces,Kiro,62.8,38.38,1
+P00322,Café y té Terra 310,Gourmet,Café y té,Silva,6.0,2.98,1
+P00323,Aceites Aurea 346,Gourmet,Aceites,Orbe,20.84,9.75,1
+P00324,Aceites Kiro 496,Gourmet,Aceites,Zenit,62.08,36.42,1
+P00325,Dulces Aurea 114,Gourmet,Dulces,Terra,8.0,5.45,1
+P00326,Dulces Silva 885,Gourmet,Dulces,Pico,234.87,129.31,1
+P00327,Conservas Aurea 623,Gourmet,Conservas,Lumen,25.17,12.3,1
+P00328,Aceites Lumen 159,Gourmet,Aceites,Lumen,34.37,19.2,1
+P00329,Aceites Kiro 222,Gourmet,Aceites,Norte,33.88,21.19,1
+P00330,Café y té Terra 270,Gourmet,Café y té,Vento,263.59,170.09,1
+P00331,Aceites Pico 378,Gourmet,Aceites,Silva,4.74,2.98,1
+P00332,Aceites Vento 156,Gourmet,Aceites,Orbe,132.56,65.18,1
+P00333,Aceites Silva 102,Gourmet,Aceites,Norte,9.05,4.1,1
+P00334,Café y té Kiro 978,Gourmet,Café y té,Norte,99.55,67.54,1
+P00335,Dulces Pico 837,Gourmet,Dulces,Vento,19.12,8.98,1
+P00336,Construcción Silva 147,Juguetes,Construcción,Pico,13.22,7.49,1
+P00337,Peluches Orbe 108,Juguetes,Peluches,Vento,41.32,24.42,1
+P00338,Juegos de mesa Orbe 891,Juguetes,Juegos de mesa,Lumen,126.95,74.47,1
+P00339,Juegos de mesa Norte 338,Juguetes,Juegos de mesa,Silva,6.2,4.09,1
+P00340,Peluches Pico 969,Juguetes,Peluches,Terra,5.78,3.37,1
+P00341,Educativos Kiro 828,Juguetes,Educativos,Terra,6.3,4.29,1
+P00342,Educativos Aurea 694,Juguetes,Educativos,Aurea,50.43,30.73,1
+P00343,Construcción Kiro 342,Juguetes,Construcción,Terra,89.37,47.25,1
+P00344,Peluches Lumen 176,Juguetes,Peluches,Lumen,50.29,32.31,1
+P00345,Construcción Vento 516,Juguetes,Construcción,Aurea,14.86,10.27,1
+P00346,Peluches Aurea 192,Juguetes,Peluches,Kiro,120.29,63.28,1
+P00347,Construcción Vento 251,Juguetes,Construcción,Aurea,24.24,16.78,1
+P00348,Construcción Kiro 131,Juguetes,Construcción,Pico,27.81,16.38,1
+P00349,Construcción Kiro 224,Juguetes,Construcción,Norte,109.77,70.83,1
+P00350,Juegos de mesa Aurea 696,Juguetes,Juegos de mesa,Zenit,77.9,50.88,1
+P00351,Construcción Orbe 928,Juguetes,Construcción,Kiro,24.9,16.48,1
+P00352,Construcción Norte 272,Juguetes,Construcción,Zenit,6.23,3.93,1
+P00353,Educativos Lumen 291,Juguetes,Educativos,Terra,70.03,46.98,1
+P00354,Juegos de mesa Silva 590,Juguetes,Juegos de mesa,Norte,31.38,17.13,1
+P00355,Juegos de mesa Pico 900,Juguetes,Juegos de mesa,Vento,298.16,192.42,1
+P00356,Peluches Norte 426,Juguetes,Peluches,Zenit,73.88,49.79,1
+P00357,Construcción Zenit 338,Juguetes,Construcción,Kiro,137.35,84.36,1
+P00358,Construcción Pico 463,Juguetes,Construcción,Kiro,21.65,12.95,1
+P00359,Peluches Vento 681,Juguetes,Peluches,Zenit,5.64,3.88,1
+P00360,Educativos Orbe 138,Juguetes,Educativos,Aurea,237.68,142.71,1
+P00361,Educativos Zenit 306,Juguetes,Educativos,Kiro,4.73,2.34,1
+P00362,Peluches Zenit 821,Juguetes,Peluches,Kiro,3.97,2.63,1
+P00363,Construcción Pico 700,Juguetes,Construcción,Aurea,56.46,29.96,0
+P00364,Educativos Kiro 824,Juguetes,Educativos,Silva,145.07,98.97,1
+P00365,Juegos de mesa Terra 230,Juguetes,Juegos de mesa,Kiro,14.34,9.85,1
+P00366,Educativos Vento 928,Juguetes,Educativos,Zenit,4.37,2.58,1
+P00367,Juegos de mesa Lumen 455,Juguetes,Juegos de mesa,Vento,57.46,38.57,1
+P00368,Peluches Lumen 355,Juguetes,Peluches,Aurea,103.94,67.22,1
+P00369,Construcción Pico 270,Juguetes,Construcción,Pico,80.51,43.85,1
+P00370,Construcción Zenit 766,Juguetes,Construcción,Lumen,154.07,72.17,1
+P00371,Peluches Aurea 175,Juguetes,Peluches,Vento,4.7,2.56,1
+P00372,Construcción Zenit 594,Juguetes,Construcción,Norte,53.75,32.97,1
+P00373,Educativos Vento 310,Juguetes,Educativos,Lumen,11.99,7.06,1
+P00374,Peluches Aurea 150,Juguetes,Peluches,Pico,28.37,18.72,1
+P00375,Peluches Terra 943,Juguetes,Peluches,Zenit,4.97,2.36,1
+P00376,Peluches Aurea 415,Juguetes,Peluches,Pico,10.26,6.91,1
+P00377,Educativos Pico 478,Juguetes,Educativos,Kiro,14.29,7.37,1
+P00378,Juegos de mesa Kiro 870,Juguetes,Juegos de mesa,Aurea,32.36,17.34,1
+P00379,Juegos de mesa Pico 938,Juguetes,Juegos de mesa,Silva,206.79,120.74,1
+P00380,Educativos Aurea 504,Juguetes,Educativos,Norte,20.66,13.95,1
+P00381,Juegos de mesa Orbe 277,Juguetes,Juegos de mesa,Kiro,12.62,8.23,1
+P00382,Educativos Pico 306,Juguetes,Educativos,Kiro,12.81,6.59,1
+P00383,Construcción Pico 665,Juguetes,Construcción,Vento,9.84,5.71,1
+P00384,Construcción Aurea 524,Juguetes,Construcción,Kiro,296.52,177.02,1
+P00385,Construcción Aurea 904,Juguetes,Construcción,Terra,10.71,7.18,1
+P00386,Peluches Zenit 723,Juguetes,Peluches,Orbe,89.06,46.21,1
+P00387,Educativos Vento 807,Juguetes,Educativos,Lumen,4.89,2.78,1
+P00388,Peluches Terra 418,Juguetes,Peluches,Terra,4.75,3.16,1
+P00389,Juegos de mesa Orbe 892,Juguetes,Juegos de mesa,Vento,13.78,7.64,1
+P00390,Juegos de mesa Pico 858,Juguetes,Juegos de mesa,Orbe,116.83,77.9,1
+P00391,Juegos de mesa Silva 513,Juguetes,Juegos de mesa,Kiro,9.46,5.5,1
+P00392,Juegos de mesa Lumen 957,Juguetes,Juegos de mesa,Norte,24.63,13.89,1
+P00393,Juegos de mesa Orbe 617,Juguetes,Juegos de mesa,Pico,29.43,14.15,1
+P00394,Peluches Kiro 991,Juguetes,Peluches,Orbe,141.52,76.06,1
+P00395,Peluches Pico 150,Juguetes,Peluches,Kiro,9.33,6.02,1
+P00396,Juegos de mesa Terra 767,Juguetes,Juegos de mesa,Pico,22.66,15.1,0
+P00397,Construcción Kiro 715,Juguetes,Construcción,Norte,161.99,97.53,1
+P00398,Peluches Vento 570,Juguetes,Peluches,Terra,98.57,51.8,1
+P00399,Educativos Vento 674,Juguetes,Educativos,Zenit,7.96,4.18,1
+P00400,Construcción Vento 982,Juguetes,Construcción,Terra,63.41,39.81,1
+P00401,Peluches Lumen 158,Juguetes,Peluches,Zenit,17.41,9.23,1
+P00402,Construcción Terra 528,Juguetes,Construcción,Pico,167.54,76.87,1

@@ -1,0 +1,187 @@
+id_cliente,nombre,apellidos,email,telefono,pais,ciudad,fecha_alta,consentimiento_marketing
+C000253,Martín,Díaz Navarro,martin.diaz9930@outlook.com,+39279703717,Italy,Turin,15/01/2022,NO
+C000784,Nuria,Rubio Muñoz,nuria.rubio2266@outlook.com,+34714865669,ES,Sevilla,2022-09-25,N
+C003268,Pablo,Torres Vázquez,pablo.torres4752@empresa.com,093-283-882,FR,Marseille,22/03/2022,N
+C003330,David,Martínez Serrano,david.martinez7653@yahoo.es,+34173284759,España,Sevilla,11/02/2024,S
+C003929,Daniel,Ramos García,daniel.ramos1370@yahoo.es,258276937,ES,Barcelona,2025-10-16,S
+C003850,Laura,Sanz Gil,laura.sanz2567@gmail.com,+34738532787,ES,Bilbao,2022-04-07,N
+C002899,Noa,Gutiérrez Vázquez,,323-889-010,Portugal,Porto,2023-02-04,SI
+C003493,Nuria,Navarro Ortega,nuria.navarro9578@outlook.com,097-504-608,ES,Bilbao,15/08/2022,S
+C002892,Álvaro,Castro López,alvaro.castro177@empresa.com,789-137-111,ESP,Bilbao,23/02/2024,N
+C003116,Carlos,Díaz Sánchez,carlos.diaz95@empresa.com,491409560,Alemania,Hamburgo,2022-09-05,1
+C001414,Pablo,Gutiérrez Torres,pablo.gutierrez5518@empresa.com,+34 700 231 806,ESP,Barcelona,2023-06-06,S
+C002435,Adrián,Torres Moreno,adrian.torres8847@empresa.com,+49199419080,DE,Berlin,2023-10-07,S
+C003815,Noa,Ramos Serrano,noa.ramos933@empresa.com,829542585,ES,Zaragoza,03/09/2024,N
+C000008,Iker,Martínez Gil,iker.martinez324@gmail.com,+39186174200,IT,Roma,2025-11-13,S
+C004210,Noa,Sánchez Martínez,noa.sanchez4497@yahoo.es,+34926109633,ESP,Madrid,2023-02-24,
+C001615,Alba,Blanco Navarro,alba.blanco7435@yahoo.es,617342188,ES,Madrid,2026-03-19,S
+C003262,Rubén,Romero Blanco,ruben.romero5364@outlook.com,456842195,ESP,Madrid,2025-04-17,N
+C002442,Álvaro,Pérez Muñoz,alvaro.perez2825@yahoo.es,280-293-468,France,Marseille,29/07/2024,SI
+C003897,Claudia,Fernández Vázquez,claudia.fernandez3292@yahoo.es,+351 068 455 811,PT,Lisboa,19/10/2022,NO
+C004534,Laura,Iglesias Ramos,laura.iglesias8142@empresa.com,299139915,ES,Sevilla,12/02/2026,SI
+C001446,Pablo,Gutiérrez Fernández,pablo.gutierrez3361@empresa.com,936-163-939,ES,Zaragoza,2022-10-23,1
+C000845,Carmen,López López,carmen.lopez214@empresa.com,+34632214584,Spain,Madrid,2024-01-30,S
+C004618,Pablo,Iglesias Marín,pablo.iglesias6296@yahoo.es,420171182,Spain,Zaragoza,2022-02-01,S
+C003561,Javier,Ramos Iglesias,javier.ramos2821@yahoo.es,318-262-580,España,Sevilla,2022-06-21,N
+C003182,Rubén,Sanz Sánchez,ruben.sanz8874@outlook.com,797113699,France,Paris,2022-07-01,N
+C004543,Julia,Álvarez Díaz,julia.alvarez3062@outlook.com,+49641134442,Germany,Hamburgo,2023-03-10,S
+C002521,Hugo,Marín Blanco,hugo.marin591@empresa.com,406-154-118,Spain,Barcelona,2023-02-14,N
+C000231,Nuria,Gutiérrez Marín,nuria.gutierrez8457@yahoo.es,762-633-529,IT,Roma,02/03/2022,NO
+C001697,Pablo,Molina Blanco,pablo.molina8893@yahoo.es,+33 651 526 386,Francia,Lyon,2026-07-25,N
+C000037,Ana,Molina Gil,ana.molina7146@yahoo.es,202-195-073,DE,Hamburgo,2026-09-17,S
+C001790,Irene,Ortega López,irene.ortega8273@empresa.com,+34 024 500 278,ES,Madrid,2025-06-05,N
+C003552,Diego,Rubio Álvarez,diego.rubio1294@empresa.com,078938014,ES,Bilbao,2026-03-10,N
+C003877,Iker,Romero Moreno,iker.romero3600@gmail.com,107-845-884,ES,Valencia,10/02/2022,N
+C003965,Laura,Álvarez Gil,laura.alvarez4061@outlook.com,+351 806 947 605,PT,Braga,2024-02-26,S
+C004694,Lucía,Álvarez Sanz,lucia.alvarez3584@outlook.com,+351831787059,PT,Lisboa,2023-09-24,N
+C002556,David,Rubio Gil,david.rubio7071@yahoo.es,+49747770190,Germany,Munich,2023-01-06,0
+C004899,Paula,Marín Torres,paula.marin9686@outlook.com,+39 552 542 236,Italy,Roma,2022-05-21,S
+C004143,Javier,Blanco Díaz,javier.blanco6255@empresa.com,690-109-838,España,Sevilla,2024-05-15,N
+C001541,Valeria,Pérez Ramos,valeria.perez3608@yahoo.es,920896012,Alemania,Berlin,2025-12-09,N
+C004489,Javier,Sanz Pérez,javier.sanz6982@outlook.com,+34 347 974 390,ES,Bilbao,05/12/2023,S
+C000378,Ana,Ortega Sánchez,ana.ortega8262@gmail.com,623980462,ES,Barcelona,2025-07-17,SI
+C004696,Claudia,Martínez Sanz,claudia.martinez8051@empresa.com,+34 298 547 749,ES,Valencia,2022-06-23,N
+C000204,Mateo,Serrano Vázquez,mateo.serrano5368@yahoo.es,204833019,ES,Zaragoza,2023-02-11,SI
+C001718,Daniel,Domínguez Gómez,daniel.dominguez3256@yahoo.es,913-724-926,Spain,Valencia,2024-04-05,S
+C001609,Álvaro,Molina Molina,alvaro.molina3822@yahoo.es,+34573628751,ESP,Zaragoza,2026-06-29,N
+C003681,Diego,Ruiz Vázquez,diego.ruiz8030@yahoo.es,264-395-047,ES,Valencia,2025-06-19,NO
+C003710,Alba,Álvarez Sanz,alba.alvarez3197@outlook.com,336780840,Italy,Turin,20/05/2023,N
+C000437,Noa,Fernández Ruiz,noa.fernandez1876@gmail.com,600-890-607,Alemania,Berlin,2023-01-13,N
+C003335,Noa,Blanco Pérez,noa.blanco2616@outlook.com,935-524-098,Italia,Turin,2023-06-26,N
+C001591,Irene,Sanz Pérez,irene.sanz8727@yahoo.es,+34214015461,ES,Bilbao,2024-07-08,S
+C000806,Mateo,Castro Muñoz,mateo.castro7159@outlook.com,935080770,ES,Valencia,08/03/2023,N
+C004840,Sergio,Gómez Alonso,sergio.gomez9884@gmail.com,170-941-429,France,Lyon,2022-09-23,N
+C000578,Martín,Rubio Romero,martin.rubio3023@gmail.com,130-004-396,ESP,Zaragoza,2026-04-11,S
+C002825,Valeria,Domínguez Gutiérrez,valeria.dominguez8511@empresa.com,+34 055 368 348,España,Sevilla,2022-10-04,
+C003787,Carlos,Ortega Sanz,carlos.ortega7105@gmail.com,+351836717314,PT,Porto,2023-02-03,SI
+C002149,Adrián,Domínguez Gil,adrian.dominguez9915@outlook.com,009-636-394,ES,Sevilla,2022-10-24,N
+C001445,Lucía,Rubio Alonso,lucia.rubio6209@outlook.com,+351 102 500 140,Portugal,Lisboa,2025-08-24,S
+C002897,Irene,Romero Muñoz,,+34 008 017 343,ES,Bilbao,10/02/2023,N
+C000772,Irene,Muñoz Molina,irene.munoz4582@yahoo.es,212151292,Portugal,Porto,2026-02-09,N
+C001049,Daniel,Torres García,daniel.torres3043@empresa.com,+34522226626,ES,Madrid,2023-08-31,N
+C005151,Daniel,Domínguez Gil,daniel.dominguez6671@gmail.com,777-790-105,ESP,Sevilla,2026-10-12,N
+C005152,Claudia,Ortega Blanco,claudia.ortega5006@gmail.com,115801581,IT,Turin,2026-10-02,S
+C005153,Laura,Gutiérrez Muñoz,,013179779,ESP,Valencia,2026-10-06,0
+C005154,Valeria,Rubio Blanco,valeria.rubio4445@outlook.com,+49200304839,Alemania,Hamburgo,2026-10-08,
+C005155,Claudia,Álvarez Álvarez,claudia.alvarez6487@empresa.com,+49 429 107 891,DE,Hamburgo,04/10/2026,SI
+C005156,Carlos,López Ruiz,carlos.lopez6125@yahoo.es,489-090-461,ES,Barcelona,2026-10-14,
+C005157,Pablo,Molina Marín,pablo.molina2284@gmail.com,+34998939429,ESP,Zaragoza,13/10/2026,0
+C005158,Javier,Serrano Gil,javier.serrano380@outlook.com,+39401111797,Italia,Milan,2026-10-03,1
+C005159,Elena,Gutiérrez Ortega,elena.gutierrez1695@outlook.com,+34362224522,ESP,Bilbao,13/10/2026,
+C005160,Carlos,Pérez Muñoz,carlos.perez4531@empresa.com,+34960879018,ES,Bilbao,07/10/2026,N
+C005161,Mateo,Moreno Iglesias,mateo.moreno7514@yahoo.es,+351237781405,PT,Porto,2026-10-04,N
+C005162,Alba,Iglesias Fernández,alba.iglesias893@empresa.com,+34005880173,ES,Bilbao,02/10/2026,S
+C005163,Carlos,Molina Gil,carlos.molina5442@outlook.com,+34 108 905 882,Spain,Valencia,2026-10-10,0
+C005164,Óscar,Castro Martínez,oscar.castro3953@yahoo.es,701893106,IT,Turin,2026-10-07,NO
+C005165,Álvaro,Castro Gil,alvaro.castro3281@gmail.com,+34 604 136 857,ES,Madrid,2026-10-09,SI
+C005166,Nuria,Domínguez Navarro,nuria.dominguez569@gmail.com,+49192537495,Germany,Munich,2026-10-08,0
+C005167,Paula,Martínez Moreno,paula.martinez7538@empresa.com,332586422,ES,Valencia,2026-10-12,S
+C005168,Sergio,Sanz Ruiz,sergio.sanz8141@gmail.com,543702637,Portugal,Lisboa,2026-10-06,N
+C005169,Noa,Pérez Vázquez,noa.perez6026@outlook.com,+49391863971,Germany,Berlin,2026-10-05,N
+C005170,Alba,Fernández Molina,alba.fernandez826@outlook.com,+351249475110,PT,Lisboa,2026-10-12,1
+C005171,Sofía,Álvarez Díaz,sofia.alvarez8253@yahoo.es,+33520539514,FR,Paris,2026-10-05,NO
+C005172,Irene,Navarro Romero,irene.navarro6737@empresa.com,208171070,IT,Turin,2026-10-02,S
+C005173,Carmen,García Gil,carmen.garcia1283@outlook.com,996961679,Alemania,Munich,2026-10-09,S
+C005174,David,Iglesias Muñoz,david.iglesias6985@empresa.com,127481858,Portugal,Lisboa,06/10/2026,0
+C005175,Javier,Molina Domínguez,javier.molina6815@gmail.com,728391749,PT,Lisboa,2026-10-08,SI
+C005176,Mateo,Serrano Gil,mateo.serrano2015@gmail.com,+34827154922,ESP,Bilbao,03/10/2026,N
+C005177,Valeria,Sanz Romero,valeria.sanz9354@empresa.com,+34 595 359 756,España,Sevilla,02/10/2026,0
+C005178,David,Marín Ortega,david.marin3090@gmail.com,+34 055 495 252,ES,Valencia,2026-10-13,NO
+C005179,Alba,García Alonso,alba.garcia4777@empresa.com,+49852118156,Germany,Hamburgo,11/10/2026,S
+C005180,David,Moreno Sánchez,david.moreno9287@outlook.com,725-071-506,España,Bilbao,2026-10-14,S
+C005181,Lucía,Torres Díaz,lucia.torres9463@outlook.com,+49507958172,Alemania,Munich,2026-10-02,SI
+C005182,Daniel,Domínguez Gutiérrez,daniel.dominguez2323@empresa.com,300193601,DE,Munich,2026-10-02,S
+C005183,Irene,García Ruiz,irene.garcia1940@yahoo.es,882-407-911,Italy,Milan,2026-10-04,NO
+C005184,Rubén,Sanz Sanz,ruben.sanz3424@outlook.com,+351 303 585 279,Portugal,Porto,2026-10-14,S
+C005185,Martín,Vázquez Fernández,martin.vazquez6546@yahoo.es,+33521874410,Francia,Marseille,2026-10-12,SI
+C005186,Ana,Muñoz Díaz,ana.munoz5417@outlook.com,+34 795 971 604,ES,Zaragoza,2026-10-06,S
+C005187,Óscar,Moreno García,oscar.moreno2178@gmail.com,311-732-619,ES,Valencia,11/10/2026,S
+C005188,David,Navarro Iglesias,david.navarro8472@gmail.com,+351 853 295 542,PT,Lisboa,04/10/2026,S
+C005189,Lucía,Gil Ortega,lucia.gil5653@empresa.com,254800046,Portugal,Braga,2026-10-10,
+C005190,Óscar,Alonso Navarro,oscar.alonso782@yahoo.es,+34148816616,ES,Sevilla,07/10/2026,S
+C005191,Pablo,Gil Navarro,pablo.gil2916@outlook.com,+34033660338,España,Zaragoza,10/10/2026,NO
+C005192,Daniel,Ramos Marín,daniel.ramos3206@outlook.com,+39 716 374 274,IT,Roma,03/10/2026,SI
+C005193,Diego,Moreno Ruiz,diego.moreno5181@empresa.com,+33027113457,FR,Paris,2026-10-05,0
+C005194,Paula,Marín Fernández,paula.marin228@yahoo.es,406-838-266,France,Toulouse,08/10/2026,NO
+C005195,Martín,Torres Torres,martin.torres4832@gmail.com,+351119215772,Portugal,Porto,2026-10-03,N
+C005196,Martín,Díaz Romero,martin.diaz4448@empresa.com,136-398-865,España,Barcelona,13/10/2026,NO
+C005197,Daniel,García Ortega,daniel.garcia4250@yahoo.es,541-459-522,ESP,Zaragoza,14/10/2026,S
+C005198,Rubén,Molina Domínguez,,990-145-366,ES,Sevilla,2026-10-14,N
+C005199,Ana,Martínez Martínez,ana.martinez5293@outlook.com,+34 908 458 227,ES,Sevilla,2026-10-11,S
+C005200,Marta,Vázquez Gómez,marta.vazquez4451@outlook.com,+39 493 141 956,Italy,Turin,2026-10-11,S
+C005201,Marta,Sanz Rubio,marta.sanz4294@yahoo.es,+34742875821,España,Bilbao,02/10/2026,N
+C005202,Noa,Sánchez Moreno,noa.sanchez3806@yahoo.es,+351 342 660 664,Portugal,Porto,2026-10-11,N
+C005203,Mateo,Ruiz Rubio,mateo.ruiz8330@empresa.com,+34 332 920 904,ES,Barcelona,14/10/2026,0
+C005204,Pablo,Marín Ruiz,pablo.marin410@outlook.com,058510242,ES,Barcelona,2026-10-08,N
+C005205,Óscar,Iglesias Muñoz,oscar.iglesias7975@empresa.com,500749873,PT,Porto,2026-10-02,S
+C005206,Hugo,Moreno Rubio,hugo.moreno9284@yahoo.es,615-199-403,ESP,Madrid,2026-10-04,S
+C005207,Ana,Díaz Ruiz,ana.diaz7810@gmail.com,484363889,PT,Lisboa,11/10/2026,S
+C005208,Javier,Navarro Ruiz,javier.navarro1052@gmail.com,+351 429 209 529,Portugal,Braga,2026-10-12,NO
+C005209,Iker,Domínguez Sánchez,iker.dominguez8641@empresa.com,072-670-198,Italy,Turin,2026-10-04,1
+C005210,Nuria,Gutiérrez Moreno,nuria.gutierrez177@empresa.com,+39 947 449 442,Italia,Milan,2026-10-05,N
+C005211,Irene,Marín Muñoz,irene.marin7376@empresa.com,665408265,Italy,Roma,11/10/2026,
+C005212,Alba,Gómez Muñoz,alba.gomez8601@outlook.com,686149996,FR,Marseille,06/10/2026,SI
+C005213,Paula,Ramos Navarro,paula.ramos6028@yahoo.es,816878056,Spain,Madrid,2026-10-02,0
+C005214,Marta,Gómez Rubio,,763-130-828,Italy,Milan,13/10/2026,NO
+C005215,Martín,Álvarez Ramos,martin.alvarez7517@empresa.com,+34 628 961 752,ES,Madrid,2026-10-05,S
+C005216,Elena,Marín García,elena.marin7190@outlook.com,+34 089 891 201,ES,Madrid,2026-10-04,S
+C005217,Laura,Fernández Molina,laura.fernandez2191@yahoo.es,+34 775 617 774,ES,Sevilla,12/10/2026,S
+C005218,Rubén,Díaz Gómez,ruben.diaz1875@outlook.com,291-141-136,ES,Valencia,2026-10-04,1
+C005219,Irene,Marín Alonso,irene.marin7668@empresa.com,+34 094 639 472,España,Bilbao,2026-10-04,N
+C005220,Lucía,Gil Serrano,lucia.gil6474@gmail.com,000922405,Spain,Zaragoza,2026-10-01,N
+C005221,Sergio,Blanco Gil,sergio.blanco6839@empresa.com,416185680,IT,Roma,14/10/2026,S
+C005222,Nuria,Fernández García,nuria.fernandez8707@outlook.com,+39 195 713 129,Italia,Turin,2026-10-02,
+C005223,Diego,Sánchez Díaz,diego.sanchez6972@outlook.com,199610553,Italy,Roma,2026-10-14,0
+C005224,Paula,Molina Martínez,paula.molina9751@empresa.com,149-444-103,FR,Toulouse,2026-10-08,SI
+C005225,Irene,Blanco Iglesias,irene.blanco4986@gmail.com,+33 276 439 312,FR,Paris,2026-10-08,1
+C005226,Ana,Blanco Sanz,ana.blanco6027@outlook.com,243544886,ESP,Barcelona,2026-10-09,N
+C005227,Julia,Sanz Vázquez,julia.sanz9315@yahoo.es,857-989-962,ES,Bilbao,01/10/2026,S
+C005228,Carmen,Alonso Domínguez,carmen.alonso1618@yahoo.es,864300099,FR,Paris,02/10/2026,S
+C005229,Elena,Martínez Domínguez,elena.martinez7469@gmail.com,639-843-290,Spain,Madrid,2026-10-13,NO
+C005230,Alba,Muñoz Gutiérrez,alba.munoz4019@gmail.com,+34759018826,ES,Zaragoza,2026-10-13,
+C005231,Carmen,Álvarez Ramos,carmen.alvarez5457@empresa.com,+34944305407,España,Valencia,02/10/2026,0
+C005232,Daniel,Domínguez García,daniel.dominguez2589@gmail.com,606-094-927,Germany,Munich,2026-10-01,N
+C005233,Álvaro,Marín Gutiérrez,alvaro.marin4730@yahoo.es,555175514,ES,Madrid,2026-10-07,NO
+C005234,Laura,Domínguez Gil,laura.dominguez5294@empresa.com,250596652,ESP,Barcelona,2026-10-02,SI
+C005235,Adrián,Ramos Serrano,adrian.ramos4914@gmail.com,+34 092 424 897,ESP,Barcelona,2026-10-02,N
+C005236,Irene,Vázquez Muñoz,irene.vazquez4035@outlook.com,329985707,ES,Madrid,2026-10-05,N
+C005237,Lucía,Blanco García,lucia.blanco5145@outlook.com,+351 880 044 357,PT,Porto,2026-10-13,N
+C005238,Martín,Alonso Torres,martin.alonso1958@gmail.com,+34 106 823 873,Spain,Zaragoza,2026-10-12,SI
+C005239,Mateo,Ruiz Gil,mateo.ruiz468@empresa.com,665425157,FR,Paris,2026-10-01,NO
+C005240,Adrián,Alonso García,adrian.alonso4575@empresa.com,+49373305442,Germany,Munich,2026-10-06,N
+C005241,Hugo,Sánchez López,hugo.sanchez2452@yahoo.es,+351 953 961 461,Portugal,Lisboa,11/10/2026,SI
+C005242,Marta,Blanco Pérez,marta.blanco6584@yahoo.es,425-203-494,France,Paris,2026-10-09,0
+C005243,Sofía,Vázquez Sanz,sofia.vazquez5294@outlook.com,+34132662295,España,Valencia,04/10/2026,SI
+C005244,Laura,Rubio Blanco,laura.rubio9844@empresa.com,+39 955 152 684,Italia,Turin,11/10/2026,0
+C005245,Ana,García Ramos,ana.garcia5575@yahoo.es,+34 506 758 392,ES,Valencia,03/10/2026,0
+C005246,Javier,Vázquez Torres,javier.vazquez2141@gmail.com,+34673387322,ESP,Sevilla,04/10/2026,NO
+C005247,Nuria,Rubio Vázquez,nuria.rubio7565@yahoo.es,583971187,Alemania,Berlin,07/10/2026,SI
+C005248,Paula,Ramos Martínez,paula.ramos2635@yahoo.es,+34 717 087 019,ES,Madrid,2026-10-14,S
+C005249,Carlos,Castro Domínguez,carlos.castro4999@empresa.com,+34594366695,ES,Madrid,2026-10-14,1
+C005250,David,Moreno Gutiérrez,david.moreno7243@yahoo.es,163-407-064,ES,Barcelona,2026-10-12,N
+C005251,Valeria,López Romero,valeria.lopez6877@empresa.com,+34 670 310 346,ES,Bilbao,03/10/2026,NO
+C005252,Álvaro,Díaz Alonso,alvaro.diaz2830@yahoo.es,+39 674 905 585,IT,Milan,2026-10-12,NO
+C005253,Hugo,Díaz Gómez,hugo.diaz5143@empresa.com,112-427-781,ES,Sevilla,2026-10-11,N
+C005254,Pablo,Ortega Ortega,pablo.ortega1961@yahoo.es,+34911972193,ES,Sevilla,2026-10-05,1
+C005255,Noa,Martínez Pérez,noa.martinez9419@gmail.com,+351732649168,PT,Porto,2026-10-06,NO
+C005256,Martín,Romero Ruiz,martin.romero8016@empresa.com,865046856,DE,Berlin,2026-10-06,1
+C005257,Carmen,Sánchez Ramos,carmen.sanchez5728@empresa.com,+34 740 003 589,ES,Sevilla,2026-10-13,1
+C005258,David,Sanz Fernández,david.sanz614@yahoo.es,746907229,DE,Hamburgo,06/10/2026,N
+C005259,Álvaro,Alonso Ramos,alvaro.alonso2055@yahoo.es,619571693,PT,Porto,2026-10-03,S
+C005260,Julia,Martínez Ruiz,julia.martinez8131@gmail.com,254839880,Portugal,Porto,2026-10-08,S
+C005261,Valeria,Blanco Ramos,valeria.blanco7414@yahoo.es,+49 856 646 335,Germany,Hamburgo,2026-10-02,N
+C005262,Marta,Serrano Ruiz,marta.serrano2203@yahoo.es,+39492785401,IT,Milan,2026-10-04,1
+C005263,Sofía,Serrano López,sofia.serrano6835@gmail.com,251003542,España,Zaragoza,2026-10-05,S
+C005264,Alba,García Alonso,alba.garcia4174@empresa.com,658-122-106,DE,Hamburgo,2026-10-12,0
+C005265,Ana,Pérez Moreno,ana.perez2300@outlook.com,716670410,ESP,Barcelona,2026-10-13,S
+C005266,Mateo,Sánchez Muñoz,mateo.sanchez4305@outlook.com,+34369606807,España,Zaragoza,2026-10-13,
+C005267,David,Moreno López,david.moreno1194@outlook.com,+49737482265,Germany,Berlin,09/10/2026,S
+C005268,Javier,Sanz García,javier.sanz9445@outlook.com,055-498-240,ES,Valencia,06/10/2026,S
+C005269,Julia,Torres Navarro,julia.torres4135@gmail.com,+351 860 120 266,PT,Lisboa,03/10/2026,
+C005270,Carmen,López Álvarez,,+351 940 277 170,PT,Lisboa,2026-10-09,S
+C005271,Adrián,Molina Blanco,ADRIAN.MOLINA2193@EMPRESA.COM,969-946-521,España,Valencia,2026-10-14,NO
+C005272,Elena,Romero Moreno,ELENA.ROMERO1817@GMAIL.COM,446592396,PT,Braga,2026-10-14,N
+C005273,Julia,Martínez Castro,JULIA.MARTINEZ760@EMPRESA.COM,293625840,ES,Madrid,2026-10-14,N
+C005274,Irene,Molina Marín,IRENE.MOLINA3844@OUTLOOK.COM,+34 091 557 322,ESP,Barcelona,2026-10-14,S
+C005275,David,Vázquez Sánchez,DAVID.VAZQUEZ4739@EMPRESA.COM,376-764-973,Germany,Hamburgo,14/10/2026,
+C005276,Paula,Castro Blanco,PAULA.CASTRO7019@YAHOO.ES,827-395-481,ESP,Sevilla,14/10/2026,N
