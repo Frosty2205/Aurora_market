@@ -1,24 +1,45 @@
 -- Funciones de carga staging -> core
--- Toda la transformación se hace en SQL, sobre el conjunto de filas de una ejecución (no fila a fila)
--- Python solo copia el fichero a staging y llama a la función de su entidad, que devuelve los contadores de la ejecución
+
+-- Toda la transformación se hace en SQL, sobre el conjunto de filas de una
+-- ejecución (no fila a fila). Python solo copia el fichero a staging y llama a
+-- la función de su entidad, que devuelve los contadores de la ejecución.
+
 -- Patrón de cada función:
---   1. Leer de staging la ejecución, normalizar y tipar en una tabla temporal
---   2. Marcar los rechazos (primera regla incumplida) y llevarlos a cuarentena
---   3. Registrar incidencias de lo que se corrige o se marca
---   4. Clasificar cada fila: insertar / actualizar / sin_cambios
---   5. Aplicar en core (upsert, SCD2, historial de estados)
--- Re-ejecutable
--- El orquestador lo aplica en cada arranque, así funciona también sobre una base de datos ya creada
+--   1. Leer de staging la ejecución, normalizar y tipar en una tabla temporal.
+--   2. Marcar los rechazos (primera regla incumplida) y llevarlos a cuarentena.
+--   3. Registrar incidencias de lo que se corrige o se marca.
+--   4. Clasificar cada fila: insertar / actualizar / sin_cambios.
+--   5. Aplicar en core (upsert, SCD2, historial de estados).
+
+-- Re-ejecutable: CREATE OR REPLACE / ON CONFLICT
+-- El orquestador lo aplica en cada arranque, así funciona también sobre una base de datos ya creada.
 
 -- Ajustes sobre objetos existentes (idempotentes)
 
--- Recarga forzada (--forzar): permite reprocesar un fichero ya cargado para demostrar la idempotencia a nivel de registro
+-- Recarga forzada (--forzar): permite reprocesar un fichero ya cargado para
+-- demostrar la idempotencia a nivel de registro.
 ALTER TABLE control.ejecucion ADD COLUMN IF NOT EXISTS forzada BOOLEAN NOT NULL DEFAULT false;
 DROP INDEX IF EXISTS control.ux_ejecucion_hash_correcta;
 CREATE UNIQUE INDEX ux_ejecucion_hash_correcta
     ON control.ejecucion (hash_fichero) WHERE estado = 'correcta' AND NOT forzada;
 
--- Reglas añadidas al diseñar la ingesta
+-- Contador de clientes fusionados por deduplicación.
+ALTER TABLE control.ejecucion ADD COLUMN IF NOT EXISTS filas_fusionadas INT CHECK (filas_fusionadas >= 0);
+
+-- Clave de deduplicación guardada en cada versión del cliente (indexada): permite
+-- reconocer un duplicado aunque coincida con un teléfono antiguo del historial.
+CREATE EXTENSION IF NOT EXISTS unaccent;
+ALTER TABLE core.cliente_version ADD COLUMN IF NOT EXISTS clave_duplicado VARCHAR(250);
+CREATE INDEX IF NOT EXISTS ix_cliente_version_clave_dup
+    ON core.cliente_version (clave_duplicado) WHERE clave_duplicado IS NOT NULL;
+
+-- Las funciones de carga devuelven ahora 6 contadores (se añade 'fusionadas').
+DROP FUNCTION IF EXISTS core.cargar_productos(BIGINT);
+DROP FUNCTION IF EXISTS core.cargar_clientes(BIGINT);
+DROP FUNCTION IF EXISTS core.cargar_pedidos(BIGINT);
+DROP FUNCTION IF EXISTS core.cargar_lineas_pedido(BIGINT);
+
+-- Reglas añadidas al diseñar la ingesta y la calidad.
 INSERT INTO control.regla_calidad (regla_id, entidad, descripcion, severidad, accion) VALUES
     ('GEN_CLAVE_VACIA',             'general',       'Identificador obligatorio vacío.', 'alta', 'rechazar'),
     ('GEN_VALOR_INVALIDO',          'general',       'Campo obligatorio vacío, no convertible o fuera de rango.', 'alta', 'rechazar'),
@@ -28,7 +49,9 @@ INSERT INTO control.regla_calidad (regla_id, entidad, descripcion, severidad, ac
     ('PRD_PRECIO_VACIO',            'productos',     'Producto sin precio de lista.', 'media', 'marcar'),
     ('PRD_CATEGORIA_NUEVA',         'productos',     'Una carga incremental crea una categoría o subcategoría nueva (posible errata).', 'media', 'marcar'),
     ('PED_TRANSICION_INVALIDA',     'pedidos',       'Cambio de estado desde un estado final (cancelado o devuelto).', 'media', 'marcar'),
-    ('LIN_PEDIDO_INEXISTENTE',      'lineas_pedido', 'Línea de un pedido que no existe en core.', 'alta', 'rechazar')
+    ('LIN_PEDIDO_INEXISTENTE',      'lineas_pedido', 'Línea de un pedido que no existe en core.', 'alta', 'rechazar'),
+    ('CLI_EMAIL_CORREGIDO',         'clientes',      'Email con un espacio en lugar de la @ y dominio habitual; se corrige.', 'media', 'corregir'),
+    ('CLI_DUPLICADO_FUSIONADO',     'clientes',      'Ficha duplicada (mismo nombre normalizado y teléfono); se fusiona con la ficha más antigua.', 'alta', 'corregir')
 ON CONFLICT (regla_id) DO UPDATE
     SET entidad = EXCLUDED.entidad, descripcion = EXCLUDED.descripcion,
         severidad = EXCLUDED.severidad, accion = EXCLUDED.accion;
@@ -41,8 +64,7 @@ LANGUAGE sql STABLE AS $$
     WHERE dominio = p_dominio AND valor_origen = upper(trim(p_valor));
 $$;
 
--- Acepta AAAA-MM-DD[ HH:MI[:SS]] y DD/MM/AAAA[ HH:MI[:SS]]
--- Devuelve NULL si no es válida
+-- Acepta AAAA-MM-DD[ HH:MI[:SS]] y DD/MM/AAAA[ HH:MI[:SS]]. Devuelve NULL si no es válida.
 CREATE OR REPLACE FUNCTION control.a_fecha(p_valor TEXT) RETURNS TIMESTAMP
 LANGUAGE plpgsql IMMUTABLE AS $$
 DECLARE v TEXT := trim(p_valor);
@@ -72,6 +94,21 @@ LANGUAGE sql IMMUTABLE AS $$
     SELECT CASE WHEN trim(p_valor) ~ '^-?\d{1,9}$' THEN trim(p_valor)::INT END
 $$;
 
+-- Clave de deduplicación: nombre normalizado | últimos 9 dígitos del teléfono.
+-- NULL si no hay teléfono utilizable (sin teléfono no se deduplica).
+CREATE OR REPLACE FUNCTION control.clave_duplicado(p_nombre TEXT, p_apellidos TEXT, p_telefono TEXT) RETURNS TEXT
+LANGUAGE sql STABLE AS $$
+    SELECT CASE WHEN length(regexp_replace(coalesce(p_telefono, ''), '\D', '', 'g')) >= 9 THEN
+        regexp_replace(translate(lower(public.unaccent(trim(coalesce(p_nombre, '')) || ' ' || trim(coalesce(p_apellidos, '')))),
+                                 'zñ', 'sn'), '\s+', ' ', 'g')
+        || '|' || right(regexp_replace(p_telefono, '\D', '', 'g'), 9)
+    END
+$$;
+
+UPDATE core.cliente_version
+SET clave_duplicado = control.clave_duplicado(nombre, apellidos, telefono)
+WHERE clave_duplicado IS NULL AND cliente_id > 0;
+
 -- Filas con al menos una corrección en la ejecución (para el contador filas_corregidas).
 CREATE OR REPLACE FUNCTION control.contar_corregidas(p_id BIGINT, p_entidad TEXT) RETURNS INT
 LANGUAGE sql STABLE AS $$
@@ -84,7 +121,7 @@ $$;
 -- Productos
 
 CREATE OR REPLACE FUNCTION core.cargar_productos(p_id BIGINT)
-RETURNS TABLE (insertadas INT, actualizadas INT, sin_cambios INT, corregidas INT, rechazadas INT)
+RETURNS TABLE (insertadas INT, actualizadas INT, sin_cambios INT, corregidas INT, rechazadas INT, fusionadas INT)
 LANGUAGE plpgsql AS $$
 DECLARE
     v_fichero TEXT;
@@ -191,24 +228,53 @@ BEGIN
            count(*) FILTER (WHERE accion = 'actualizar')::INT,
            count(*) FILTER (WHERE accion = 'sin_cambios')::INT,
            control.contar_corregidas(p_id, 'productos'),
-           count(*) FILTER (WHERE regla IS NOT NULL)::INT
+           count(*) FILTER (WHERE regla IS NOT NULL)::INT,
+           0
     FROM t_prod;
 END $$;
 
--- Clientes (identidad + ids ERP + versiones SCD2)
-
--- Punto de enganche para la deduplicación (apartado 8)
--- Recibe las filas nuevas de t_cli (cliente_id NULL) y puede asignarles el cliente_id de un cliente ya
--- existente o de otra fila del lote, poniendo motivo_asignacion = 'fusion_duplicado'
--- De momento no fusiona nada: asignación uno a uno (esto ya se hará después)
+-- Clientes (identidad + ids ERP + versiones SCD2 + deduplicación)
+-- Deduplicación (apartado 8). Criterio: mismo nombre normalizado + mismo teléfono.
+--   * Nombre normalizado: minúsculas, sin tildes, z = s, ñ = n, espacios simples
+--     ("Muñoz Martínez" y "Munos Martínes" coinciden).
+--   * Teléfono: últimos 9 dígitos (ignora prefijo, espacios y guiones).
+-- Se aplica sobre las filas nuevas del lote (cliente_id NULL), en este orden:
+--   1. Coincide con un cliente que ya existe (cualquier versión de su historial).
+--   2. Coincide con otra fila del lote que ya tiene cliente.
+--   3. Coincide con otras filas nuevas: prevalece la de alta más antigua.
+-- Las fusionadas quedan con motivo_asignacion = 'fusion_duplicado'.
 CREATE OR REPLACE FUNCTION core.resolver_duplicados_clientes(p_id BIGINT) RETURNS INT
 LANGUAGE plpgsql AS $$
+DECLARE v_fusionadas INT;
 BEGIN
-    RETURN 0;
+    UPDATE t_cli t SET cliente_id = v.cliente_id, motivo_asignacion = 'fusion_duplicado'
+    FROM (SELECT DISTINCT ON (clave_duplicado) clave_duplicado, cliente_id
+          FROM core.cliente_version
+          WHERE clave_duplicado IS NOT NULL AND cliente_id > 0
+          ORDER BY clave_duplicado, cliente_id) v
+    WHERE t.regla IS NULL AND t.cliente_id IS NULL AND t.clave_dup = v.clave_duplicado;
+
+    UPDATE t_cli t SET cliente_id = k.cliente_id, motivo_asignacion = 'fusion_duplicado'
+    FROM (SELECT DISTINCT ON (clave_dup) clave_dup, cliente_id
+          FROM t_cli
+          WHERE regla IS NULL AND cliente_id IS NOT NULL AND clave_dup IS NOT NULL
+          ORDER BY clave_dup, cliente_id) k
+    WHERE t.regla IS NULL AND t.cliente_id IS NULL AND t.clave_dup = k.clave_dup;
+
+    UPDATE t_cli t SET absorbe_en_fila = g.fila_superviviente, motivo_asignacion = 'fusion_duplicado'
+    FROM (SELECT num_fila,
+                 first_value(num_fila) OVER (PARTITION BY clave_dup
+                                             ORDER BY fecha_alta NULLS LAST, id_erp) AS fila_superviviente
+          FROM t_cli
+          WHERE regla IS NULL AND cliente_id IS NULL AND clave_dup IS NOT NULL) g
+    WHERE t.num_fila = g.num_fila AND g.fila_superviviente <> g.num_fila;
+
+    SELECT count(*) INTO v_fusionadas FROM t_cli WHERE motivo_asignacion = 'fusion_duplicado';
+    RETURN v_fusionadas;
 END $$;
 
 CREATE OR REPLACE FUNCTION core.cargar_clientes(p_id BIGINT)
-RETURNS TABLE (insertadas INT, actualizadas INT, sin_cambios INT, corregidas INT, rechazadas INT)
+RETURNS TABLE (insertadas INT, actualizadas INT, sin_cambios INT, corregidas INT, rechazadas INT, fusionadas INT)
 LANGUAGE plpgsql AS $$
 DECLARE
     v_fichero TEXT;
@@ -226,6 +292,7 @@ BEGIN
            nullif(trim(s.apellidos), '')                      AS apellidos,
            s.email                                            AS email_txt,
            CASE WHEN lower(trim(s.email)) ~ v_regex_email THEN lower(trim(s.email)) END AS email,
+           false                                              AS email_corregido,
            nullif(regexp_replace(coalesce(s.telefono, ''), '[^0-9+]', '', 'g'), '') AS telefono,
            s.pais                                             AS pais_txt,
            control.normalizar('pais', s.pais)                 AS codigo_pais,
@@ -234,11 +301,11 @@ BEGIN
            control.a_fecha(s.fecha_alta)::DATE                AS fecha_alta,
            s.consentimiento_marketing                         AS consent_txt,
            control.normalizar('consentimiento', s.consentimiento_marketing)::BOOLEAN AS consentimiento,
+           control.clave_duplicado(s.nombre, s.apellidos, s.telefono) AS clave_dup,
            to_jsonb(s) - ARRAY['id_ejecucion', 'fichero_origen', 'fecha_carga', 'hash_fila'] AS registro,
-           NULL::TEXT AS regla, NULL::TEXT AS motivo,
-           NULL::BIGINT AS cliente_id, 'alta'::TEXT AS motivo_asignacion,
-           NULL::TEXT AS hash_atributos, NULL::TEXT AS accion,
-           false AS nueva_version, false AS cambia_fecha_alta
+           NULL::TEXT   AS regla, NULL::TEXT AS motivo,
+           NULL::BIGINT AS cliente_id, NULL::TEXT AS motivo_asignacion, NULL::INT AS absorbe_en_fila,
+           NULL::TEXT   AS accion
     FROM staging.clientes s
     WHERE s.id_ejecucion = p_id;
 
@@ -255,6 +322,21 @@ BEGIN
     INSERT INTO control.cuarentena (id_ejecucion, regla_id, entidad, fichero_origen, num_fila, registro, motivo)
     SELECT p_id, regla, 'clientes', v_fichero, num_fila, registro, motivo FROM t_cli WHERE regla IS NOT NULL;
 
+    -- Email con un espacio en lugar de la @: se corrige si el dominio resultante es
+    -- uno de los habituales en los emails válidos (aparece al menos 10 veces).
+    WITH dominios AS (
+        SELECT split_part(e, '@', 2) AS dominio
+        FROM (SELECT email AS e FROM t_cli WHERE email IS NOT NULL
+              UNION ALL
+              SELECT email FROM core.cliente_version WHERE es_actual AND email IS NOT NULL) z
+        GROUP BY 1 HAVING count(*) >= 10
+    )
+    UPDATE t_cli
+    SET email = replace(lower(trim(email_txt)), ' ', '@'), email_corregido = true
+    WHERE regla IS NULL AND email IS NULL
+      AND lower(trim(email_txt)) ~ '^[^@[:space:]]+ [^@[:space:]]+\.[a-z]{2,}$'
+      AND split_part(lower(trim(email_txt)), ' ', 2) IN (SELECT dominio FROM dominios);
+
     -- Incidencias (correcciones y marcas)
     INSERT INTO control.incidencia_calidad (id_ejecucion, regla_id, entidad, clave_registro, num_fila, campo, valor_original, valor_nuevo)
     SELECT p_id, x.regla, 'clientes', t.id_erp, t.num_fila, x.campo, x.original, x.nuevo
@@ -270,6 +352,8 @@ BEGIN
             trim(coalesce(t.pais_txt, '')) <> '' AND t.codigo_pais IS NULL),
         ('CLI_EMAIL_VACIO', 'email', t.email_txt, NULL,
             trim(coalesce(t.email_txt, '')) = ''),
+        ('CLI_EMAIL_CORREGIDO', 'email', t.email_txt, t.email,
+            t.email_corregido),
         ('CLI_EMAIL_INVALIDO', 'email', t.email_txt, NULL,
             trim(coalesce(t.email_txt, '')) <> '' AND t.email IS NULL),
         ('CLI_CONSENT_DESCONOCIDO', 'consentimiento_marketing', t.consent_txt, NULL,
@@ -279,18 +363,27 @@ BEGIN
     ) AS x(regla, campo, original, nuevo, aplica)
     WHERE t.regla IS NULL AND x.aplica;
 
-    -- Identidad: ids del ERP ya conocidos
-    UPDATE t_cli t SET cliente_id = m.cliente_id
+    -- Identidad: ids del ERP ya conocidos (incluidos los que se fusionaron en cargas anteriores)
+    UPDATE t_cli t SET cliente_id = m.cliente_id, motivo_asignacion = m.motivo_asignacion
     FROM core.cliente_id_erp m
     WHERE t.regla IS NULL AND m.id_cliente_erp = t.id_erp;
 
-    -- Deduplicación de los nuevos (apartado 8)
+    -- Deduplicación de los ids nuevos
     PERFORM core.resolver_duplicados_clientes(p_id);
 
-    -- Clientes nuevos: se reservan sus claves de una vez (operación de conjunto)
+    -- Clientes realmente nuevos: se reservan sus claves de una vez (operación de conjunto)
     UPDATE t_cli SET cliente_id = nextval(pg_get_serial_sequence('core.cliente', 'cliente_id')),
-                     accion = 'insertar', nueva_version = true
-    WHERE regla IS NULL AND cliente_id IS NULL;
+                     motivo_asignacion = 'alta', accion = 'insertar'
+    WHERE regla IS NULL AND cliente_id IS NULL AND absorbe_en_fila IS NULL;
+
+    -- Duplicados dentro del lote: toman el cliente de su superviviente
+    UPDATE t_cli t SET cliente_id = s.cliente_id
+    FROM t_cli s WHERE t.absorbe_en_fila = s.num_fila;
+
+    -- Ids nuevos que se fusionan con un cliente
+    UPDATE t_cli t SET accion = 'fusionar'
+    WHERE t.regla IS NULL AND t.motivo_asignacion = 'fusion_duplicado'
+      AND NOT EXISTS (SELECT 1 FROM core.cliente_id_erp m WHERE m.id_cliente_erp = t.id_erp);
 
     INSERT INTO core.cliente (cliente_id, fecha_alta, id_ejecucion)
     SELECT cliente_id, fecha_alta, p_id FROM t_cli WHERE accion = 'insertar';
@@ -301,43 +394,101 @@ BEGIN
     WHERE t.regla IS NULL
       AND NOT EXISTS (SELECT 1 FROM core.cliente_id_erp m WHERE m.id_cliente_erp = t.id_erp);
 
-    -- Huella de los atributos versionados
-    UPDATE t_cli SET hash_atributos = md5(concat_ws('|', nombre, coalesce(apellidos, ''), coalesce(email, ''),
-                                                    coalesce(telefono, ''), coalesce(codigo_pais, ''),
-                                                    coalesce(ciudad, ''), coalesce(consentimiento::TEXT, 'null')))
-    WHERE regla IS NULL;
-
-    -- Clientes existentes: ¿cambian sus atributos o su fecha de alta?
-    UPDATE t_cli t
-    SET nueva_version     = (v.hash_atributos IS DISTINCT FROM t.hash_atributos),
-        cambia_fecha_alta = (t.fecha_alta IS NOT NULL AND c.fecha_alta IS DISTINCT FROM t.fecha_alta)
-    FROM core.cliente c
-    LEFT JOIN core.cliente_version v ON v.cliente_id = c.cliente_id AND v.es_actual
-    WHERE t.regla IS NULL AND t.accion IS NULL AND c.cliente_id = t.cliente_id;
-
-    UPDATE t_cli SET accion = CASE WHEN nueva_version OR cambia_fecha_alta THEN 'actualizar' ELSE 'sin_cambios' END
-    WHERE regla IS NULL AND accion IS NULL;
-
     INSERT INTO control.incidencia_calidad (id_ejecucion, regla_id, entidad, clave_registro, num_fila, campo, valor_original, valor_nuevo)
-    SELECT p_id, 'CLI_FECHA_ALTA_CAMBIA', 'clientes', t.id_erp, t.num_fila, 'fecha_alta', c.fecha_alta::TEXT, t.fecha_alta::TEXT
-    FROM t_cli t JOIN core.cliente c ON c.cliente_id = t.cliente_id
-    WHERE t.cambia_fecha_alta;
+    SELECT p_id, 'CLI_DUPLICADO_FUSIONADO', 'clientes', t.id_erp, t.num_fila, 'id_cliente', t.id_erp, sup.id_erp
+    FROM t_cli t
+    CROSS JOIN LATERAL (SELECT min(m.id_cliente_erp) AS id_erp FROM core.cliente_id_erp m
+                        WHERE m.cliente_id = t.cliente_id AND m.motivo_asignacion = 'alta') sup
+    WHERE t.accion = 'fusionar';
+
+    -- Atributos resultantes por cliente.
+    -- Base: la fila de su ficha original (motivo 'alta') si viene en el lote; si no, su versión vigente.
+    -- Las fichas fusionadas solo aportan: datos que falten, su fecha de alta si es anterior
+    -- y la negativa de consentimiento (si alguna ficha dice "no", el resultado es "no").
+    DROP TABLE IF EXISTS t_obj;
+    CREATE TEMP TABLE t_obj ON COMMIT DROP AS
+    SELECT k.cliente_id,
+           (p.num_fila IS NOT NULL) AS viene_principal,
+           CASE WHEN p.num_fila IS NOT NULL THEN p.nombre         ELSE v.nombre                   END AS nombre,
+           CASE WHEN p.num_fila IS NOT NULL THEN p.apellidos      ELSE v.apellidos                END AS apellidos,
+           CASE WHEN p.num_fila IS NOT NULL THEN p.email          ELSE v.email                    END AS email,
+           CASE WHEN p.num_fila IS NOT NULL THEN p.telefono       ELSE v.telefono                 END AS telefono,
+           CASE WHEN p.num_fila IS NOT NULL THEN p.codigo_pais    ELSE v.codigo_pais              END AS codigo_pais,
+           CASE WHEN p.num_fila IS NOT NULL THEN p.ciudad         ELSE v.ciudad                   END AS ciudad,
+           CASE WHEN p.num_fila IS NOT NULL THEN p.consentimiento ELSE v.consentimiento_marketing END AS consentimiento,
+           CASE WHEN p.num_fila IS NOT NULL THEN coalesce(p.fecha_alta, c.fecha_alta) ELSE c.fecha_alta END AS fecha_alta,
+           c.fecha_alta     AS fecha_alta_actual,
+           v.hash_atributos AS hash_actual,
+           NULL::TEXT       AS hash_nuevo,
+           false            AS nueva_version,
+           false            AS cambia_fecha_alta,
+           EXISTS (SELECT 1 FROM t_cli n WHERE n.cliente_id = k.cliente_id AND n.accion = 'insertar') AS es_nuevo
+    FROM (SELECT DISTINCT cliente_id FROM t_cli WHERE regla IS NULL) k
+    LEFT JOIN t_cli p ON p.cliente_id = k.cliente_id AND p.regla IS NULL AND p.motivo_asignacion = 'alta'
+    LEFT JOIN core.cliente c ON c.cliente_id = k.cliente_id
+    LEFT JOIN core.cliente_version v ON v.cliente_id = k.cliente_id AND v.es_actual;
+
+    UPDATE t_obj o SET
+        apellidos      = coalesce(o.apellidos,   s.apellidos),
+        email          = coalesce(o.email,       s.email),
+        telefono       = coalesce(o.telefono,    s.telefono),
+        codigo_pais    = coalesce(o.codigo_pais, s.codigo_pais),
+        ciudad         = coalesce(o.ciudad,      s.ciudad),
+        consentimiento = CASE WHEN o.consentimiento IS FALSE OR s.algun_no THEN false
+                              WHEN o.consentimiento IS TRUE  OR s.algun_si THEN true END,
+        fecha_alta     = least(o.fecha_alta, s.fecha_alta_min)
+    FROM (SELECT cliente_id,
+                 (array_agg(apellidos   ORDER BY num_fila) FILTER (WHERE apellidos   IS NOT NULL))[1] AS apellidos,
+                 (array_agg(email       ORDER BY num_fila) FILTER (WHERE email       IS NOT NULL))[1] AS email,
+                 (array_agg(telefono    ORDER BY num_fila) FILTER (WHERE telefono    IS NOT NULL))[1] AS telefono,
+                 (array_agg(codigo_pais ORDER BY num_fila) FILTER (WHERE codigo_pais IS NOT NULL))[1] AS codigo_pais,
+                 (array_agg(ciudad      ORDER BY num_fila) FILTER (WHERE ciudad      IS NOT NULL))[1] AS ciudad,
+                 bool_or(consentimiento IS FALSE) AS algun_no,
+                 bool_or(consentimiento IS TRUE)  AS algun_si,
+                 min(fecha_alta) AS fecha_alta_min
+          FROM t_cli
+          WHERE regla IS NULL AND motivo_asignacion = 'fusion_duplicado'
+          GROUP BY cliente_id) s
+    WHERE o.cliente_id = s.cliente_id;
+
+    UPDATE t_obj SET hash_nuevo = md5(concat_ws('|', nombre, coalesce(apellidos, ''), coalesce(email, ''),
+                                                coalesce(telefono, ''), coalesce(codigo_pais, ''),
+                                                coalesce(ciudad, ''), coalesce(consentimiento::TEXT, 'null')));
+    UPDATE t_obj SET nueva_version     = hash_actual IS DISTINCT FROM hash_nuevo,
+                     cambia_fecha_alta = NOT es_nuevo AND fecha_alta IS NOT NULL
+                                         AND fecha_alta IS DISTINCT FROM fecha_alta_actual;
+
+    -- Clasificación de las filas restantes (para los contadores)
+    UPDATE t_cli t SET accion = CASE
+            WHEN t.motivo_asignacion = 'alta' AND (o.nueva_version OR o.cambia_fecha_alta) THEN 'actualizar'
+            WHEN t.motivo_asignacion <> 'alta' AND NOT o.viene_principal
+                 AND (o.nueva_version OR o.cambia_fecha_alta) THEN 'actualizar'
+            ELSE 'sin_cambios' END
+    FROM t_obj o
+    WHERE t.regla IS NULL AND t.accion IS NULL AND o.cliente_id = t.cliente_id;
+
+    INSERT INTO control.incidencia_calidad (id_ejecucion, regla_id, entidad, clave_registro, campo, valor_original, valor_nuevo)
+    SELECT p_id, 'CLI_FECHA_ALTA_CAMBIA', 'clientes',
+           (SELECT min(m.id_cliente_erp) FROM core.cliente_id_erp m WHERE m.cliente_id = o.cliente_id),
+           'fecha_alta', o.fecha_alta_actual::TEXT, o.fecha_alta::TEXT
+    FROM t_obj o WHERE o.cambia_fecha_alta;
 
     UPDATE core.cliente c
-    SET fecha_alta = t.fecha_alta, fecha_actualizacion = now(), id_ejecucion = p_id
-    FROM t_cli t WHERE t.cambia_fecha_alta AND c.cliente_id = t.cliente_id;
+    SET fecha_alta = o.fecha_alta, fecha_actualizacion = now(), id_ejecucion = p_id
+    FROM t_obj o WHERE o.cambia_fecha_alta AND c.cliente_id = o.cliente_id;
 
     -- SCD2: se cierra la versión vigente y se abre la nueva
     UPDATE core.cliente_version v
     SET valido_hasta = v_ts, es_actual = false
-    FROM t_cli t
-    WHERE t.nueva_version AND t.accion = 'actualizar' AND v.cliente_id = t.cliente_id AND v.es_actual;
+    FROM t_obj o
+    WHERE o.nueva_version AND v.cliente_id = o.cliente_id AND v.es_actual;
 
     INSERT INTO core.cliente_version (cliente_id, nombre, apellidos, email, telefono, codigo_pais, ciudad,
-                                      consentimiento_marketing, valido_desde, es_actual, hash_atributos, id_ejecucion)
-    SELECT cliente_id, nombre, apellidos, email, telefono, codigo_pais, ciudad,
-           consentimiento, v_ts, true, hash_atributos, p_id
-    FROM t_cli WHERE nueva_version;
+                                      consentimiento_marketing, valido_desde, es_actual, hash_atributos,
+                                      clave_duplicado, id_ejecucion)
+    SELECT cliente_id, nombre, apellidos, email, telefono, codigo_pais, ciudad, consentimiento,
+           v_ts, true, hash_nuevo, control.clave_duplicado(nombre, apellidos, telefono), p_id
+    FROM t_obj WHERE nueva_version;
 
     -- Pedidos que esperaban a este cliente (estaban en -1)
     UPDATE core.pedido p SET cliente_id = m.cliente_id, fecha_actualizacion = now(), id_ejecucion = p_id
@@ -349,14 +500,17 @@ BEGIN
            count(*) FILTER (WHERE accion = 'actualizar')::INT,
            count(*) FILTER (WHERE accion = 'sin_cambios')::INT,
            control.contar_corregidas(p_id, 'clientes'),
-           count(*) FILTER (WHERE regla IS NOT NULL)::INT
+           count(*) FILTER (WHERE regla IS NOT NULL)::INT,
+           count(*) FILTER (WHERE accion = 'fusionar')::INT
     FROM t_cli;
 END $$;
 
+-- -----------------------------------------------------------------------------
 -- Pedidos (cabecera + historial de estados)
+-- -----------------------------------------------------------------------------
 
 CREATE OR REPLACE FUNCTION core.cargar_pedidos(p_id BIGINT)
-RETURNS TABLE (insertadas INT, actualizadas INT, sin_cambios INT, corregidas INT, rechazadas INT)
+RETURNS TABLE (insertadas INT, actualizadas INT, sin_cambios INT, corregidas INT, rechazadas INT, fusionadas INT)
 LANGUAGE plpgsql AS $$
 DECLARE
     v_fichero TEXT;
@@ -472,14 +626,15 @@ BEGIN
            count(*) FILTER (WHERE accion = 'actualizar')::INT,
            count(*) FILTER (WHERE accion = 'sin_cambios')::INT,
            control.contar_corregidas(p_id, 'pedidos'),
-           count(*) FILTER (WHERE regla IS NOT NULL)::INT
+           count(*) FILTER (WHERE regla IS NOT NULL)::INT,
+           0
     FROM t_ped;
 END $$;
 
 -- Líneas de pedido
 
 CREATE OR REPLACE FUNCTION core.cargar_lineas_pedido(p_id BIGINT)
-RETURNS TABLE (insertadas INT, actualizadas INT, sin_cambios INT, corregidas INT, rechazadas INT)
+RETURNS TABLE (insertadas INT, actualizadas INT, sin_cambios INT, corregidas INT, rechazadas INT, fusionadas INT)
 LANGUAGE plpgsql AS $$
 DECLARE
     v_fichero    TEXT;
@@ -508,7 +663,7 @@ BEGIN
     LEFT JOIN core.producto pr ON pr.id_producto_erp = upper(trim(s.id_producto))
     WHERE s.id_ejecucion = p_id;
 
-    -- Integridad y tipos
+    -- 1. Integridad y tipos
     UPDATE t_lin SET regla = 'LIN_PEDIDO_INEXISTENTE', motivo = 'el pedido ' || coalesce(id_pedido_erp, '(vacío)') || ' no existe'
     WHERE pedido_id IS NULL;
     UPDATE t_lin SET regla = 'GEN_VALOR_INVALIDO', motivo = 'num_linea no válido'
@@ -520,7 +675,7 @@ BEGIN
     UPDATE t_lin SET regla = 'GEN_VALOR_INVALIDO', motivo = 'descuento fuera de 0-100'
     WHERE regla IS NULL AND (descuento_pct IS NULL OR descuento_pct NOT BETWEEN 0 AND 100);
 
-    -- Duplicados en el fichero: prevalece la versión válida (cantidad > 0) y, si empatan, la última
+    -- 2. Duplicados en el fichero: prevalece la versión válida (cantidad > 0) y, si empatan, la última
     UPDATE t_lin t
     SET regla  = CASE WHEN t.huella = d.huella_ganadora THEN 'LIN_DUPLICADA' ELSE 'LIN_CONFLICTO' END,
         motivo = CASE WHEN t.huella = d.huella_ganadora THEN 'copia exacta de otra línea'
@@ -609,6 +764,7 @@ BEGIN
            count(*) FILTER (WHERE accion = 'actualizar')::INT,
            count(*) FILTER (WHERE accion = 'sin_cambios')::INT,
            control.contar_corregidas(p_id, 'lineas_pedido'),
-           count(*) FILTER (WHERE regla IS NOT NULL)::INT
+           count(*) FILTER (WHERE regla IS NOT NULL)::INT,
+           0
     FROM t_lin;
 END $$;

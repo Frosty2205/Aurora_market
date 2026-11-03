@@ -1,22 +1,23 @@
 """
-Aurora Market - Orquestador de la ingesta
+Aurora Market · Orquestador de la ingesta.
 
 Uso:
     python ingesta.py inicial [--forzar]       # productos, clientes, pedidos y líneas (_erp)
     python ingesta.py delta   [--forzar]       # clientes, pedidos y líneas (_delta)
     python ingesta.py fichero RUTA [--forzar]  # un fichero suelto (entidad y tipo por el nombre)
     python ingesta.py resumen                  # últimas ejecuciones registradas
+    python ingesta.py informe                  # informe de calidad antes / después
 
 Python solo hace tres cosas: calcular el hash del fichero, copiarlo a staging con
-COPY y llamar a la función SQL de su entidad. Toda la transformación es SQL
+COPY y llamar a la función SQL de su entidad. Toda la transformación es SQL.
 
 Por cada fichero:
-  1. Se registra la ejecución en control.ejecucion (transacción propia)
+  1. Se registra la ejecución en control.ejecucion (transacción propia).
   2. Si su hash ya se cargó correctamente, se marca como 'omitida' y se salta
-     (salvo --forzar, que reprocesa para demostrar la idempotencia por registro)
-  3. Copia a staging + carga en core + cierre de la ejecución, en una transacción:
-     Se aplica todo o nada. Si falla, la ejecución queda 'fallida' con el error
-     y se detienen los ficheros siguientes (dependen de este)
+     (salvo --forzar, que reprocesa para demostrar la idempotencia por registro).
+  3. Copia a staging + carga en core + cierre de la ejecución, en UNA transacción:
+     o se aplica todo o nada. Si falla, la ejecución queda 'fallida' con el error
+     y se detienen los ficheros siguientes (dependen de este).
 
 Conexión: variables PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD.
 Ficheros: carpeta indicada en DATOS_DIR (por defecto /datos).
@@ -30,10 +31,10 @@ import sys
 import time
 from pathlib import Path
 
-import psycopg # Librería para conectar Python con PostgreSQL
+import psycopg
 
 DATOS_DIR = Path(os.environ.get("DATOS_DIR", "/datos"))
-SQL_FUNCIONES = Path(os.environ.get("SQL_FUNCIONES", "/app/sql/06_funciones_ingesta.sql"))
+SQL_DIR = Path(os.environ.get("SQL_DIR", "/app/sql"))
 
 # Entidad -> columnas esperadas en el CSV y función SQL que la carga
 ENTIDADES = {
@@ -95,9 +96,68 @@ def conectar() -> psycopg.Connection:
 
 
 def preparar_funciones(conn: psycopg.Connection) -> None:
-    """Aplica las funciones de carga (CREATE OR REPLACE): siempre la versión actual"""
-    conn.execute(SQL_FUNCIONES.read_text(encoding="utf-8"))
+    """Aplica las funciones de carga y vistas de calidad (scripts 06 en adelante).
+    Son re-ejecutables (CREATE OR REPLACE): siempre se usa la versión actual."""
+    for script in sorted(SQL_DIR.glob("0[6-9]_*.sql")):
+        conn.execute(script.read_text(encoding="utf-8"))
     conn.commit()
+
+
+def informe(conn) -> None:
+    """Informe de calidad: antes/después, reglas aplicadas, deduplicación y emails."""
+    def tabla(titulo, cabecera, filas, anchos):
+        print(f"\n## {titulo}")
+        numericas = [bool(filas) and isinstance(v, int) for v in (filas[0] if filas else cabecera)]
+        print("  ".join(f"{c:>{a}}" if n else f"{c:<{a}}" for c, a, n in zip(cabecera, anchos, numericas)))
+        for f in filas:
+            print("  ".join(f"{str(v):>{a}}" if n else f"{str(v):<{a}}" for v, a, n in zip(f, anchos, numericas)))
+
+    print("## 1. Calidad antes (datos tal como llegaron) / después (core)")
+    filas = conn.execute("""
+        SELECT entidad, dimension, indicador, antes_ok, antes_total, antes_pct,
+               despues_ok, despues_total, despues_pct
+        FROM control.v_informe_calidad ORDER BY orden""").fetchall()
+    print(f"{'entidad':<14} {'dimensión':<13} {'indicador':<64} {'antes':>22} {'después':>22}")
+    for e, d, i, ao, at, ap, do, dt, dp in filas:
+        print(f"{e:<14} {d:<13} {i:<64} {f'{ap}% ({ao}/{at})':>22} {f'{dp}% ({do}/{dt})':>22}")
+
+    filas = conn.execute("""
+        SELECT accion, regla_id, entidad, registros FROM control.v_resumen_reglas
+        WHERE registros > 0
+        ORDER BY CASE accion WHEN 'rechazar' THEN 1 WHEN 'corregir' THEN 2 ELSE 3 END, registros DESC""").fetchall()
+    tabla("2. Registros afectados por cada regla (cargas no forzadas)",
+          ["acción", "regla", "entidad", "registros"], filas, [10, 28, 14, 10])
+
+    filas = conn.execute("""
+        SELECT e.fichero_origen, count(*)
+        FROM control.incidencia_calidad i JOIN control.ejecucion e USING (id_ejecucion)
+        WHERE i.regla_id = 'CLI_DUPLICADO_FUSIONADO' AND NOT e.forzada
+        GROUP BY 1 ORDER BY 1""").fetchall()
+    tabla("3. Deduplicación de clientes (mismo nombre normalizado + teléfono)",
+          ["fichero", "fichas fusionadas"], filas, [22, 18])
+    total = conn.execute("""
+        SELECT (SELECT count(*) FROM core.cliente WHERE cliente_id > 0),
+               (SELECT count(*) FROM core.cliente_id_erp)""").fetchone()
+    print(f"Resultado: {total[1]} ids del ERP -> {total[0]} clientes únicos.")
+    filas = conn.execute("""
+        SELECT f.id_cliente_erp, vf.nombre || ' ' || coalesce(vf.apellidos, ''),
+               o.id_cliente_erp,
+               (SELECT count(*) FROM core.pedido p WHERE p.cliente_id = f.cliente_id)
+        FROM core.cliente_id_erp f
+        JOIN core.cliente_id_erp o ON o.cliente_id = f.cliente_id AND o.motivo_asignacion = 'alta'
+        JOIN core.cliente_version vf ON vf.cliente_id = f.cliente_id AND vf.es_actual
+        WHERE f.motivo_asignacion = 'fusion_duplicado'
+        ORDER BY f.id_cliente_erp LIMIT 5""").fetchall()
+    tabla("3b. Ejemplos (la ficha fusionada se une a la más antigua)",
+          ["id fusionado", "cliente", "id que prevalece", "pedidos totales"], filas, [14, 28, 18, 16])
+
+    filas = conn.execute("""
+        SELECT valor_original, valor_nuevo FROM control.incidencia_calidad
+        WHERE regla_id = 'CLI_EMAIL_CORREGIDO'
+          AND id_ejecucion IN (SELECT id_ejecucion FROM control.ejecucion WHERE NOT forzada)
+        ORDER BY 1""").fetchall()
+    tabla(f"4. Emails corregidos (espacio en lugar de @ y dominio habitual): {len(filas)}",
+          ["original", "corregido"], filas[:5], [34, 34])
 
 
 def copiar_a_staging(conn, id_ejecucion: int, fichero: Path, entidad: str) -> int:
@@ -150,17 +210,17 @@ def procesar(conn, fichero: Path, forzar: bool) -> bool:
 
     try:
         leidas = copiar_a_staging(conn, id_ejecucion, fichero, entidad)
-        ins, act, sin, corr, rech = conn.execute(
+        ins, act, sin, corr, rech, fus = conn.execute(
             f"SELECT * FROM {ENTIDADES[entidad]['funcion']}(%s)", (id_ejecucion,)).fetchone()
         conn.execute("""
             UPDATE control.ejecucion
             SET estado = 'correcta', fecha_fin = now(), filas_leidas = %s, filas_insertadas = %s,
                 filas_actualizadas = %s, filas_sin_cambios = %s, filas_corregidas = %s,
-                filas_rechazadas = %s
-            WHERE id_ejecucion = %s""", (leidas, ins, act, sin, corr, rech, id_ejecucion))
+                filas_rechazadas = %s, filas_fusionadas = %s
+            WHERE id_ejecucion = %s""", (leidas, ins, act, sin, corr, rech, fus, id_ejecucion))
         conn.commit()
         print(f"  {fichero.name:<26} leídas {leidas:>7} | insertadas {ins:>7} | actualizadas {act:>5} | "
-              f"sin cambios {sin:>7} | corregidas {corr:>6} | rechazadas {rech:>5}")
+              f"sin cambios {sin:>7} | fusionadas {fus:>4} | corregidas {corr:>6} | rechazadas {rech:>5}")
         return True
     except Exception as error:   # se deshace este fichero y se deja constancia
         conn.rollback()
@@ -176,18 +236,18 @@ def resumen(conn, limite: int = 10) -> None:
     filas = conn.execute("""
         SELECT id_ejecucion, fichero_origen, estado, to_char(fecha_inicio, 'YYYY-MM-DD HH24:MI:SS'),
                filas_leidas, filas_insertadas, filas_actualizadas, filas_sin_cambios,
-               filas_corregidas, filas_rechazadas
+               filas_fusionadas, filas_corregidas, filas_rechazadas
         FROM control.ejecucion ORDER BY id_ejecucion DESC LIMIT %s""", (limite,)).fetchall()
     print(f"\n{'id':>4}  {'fichero':<26} {'estado':<9} {'inicio':<19} {'leídas':>7} {'insert.':>7} "
-          f"{'actual.':>7} {'sin camb.':>9} {'correg.':>7} {'rechaz.':>7}")
+          f"{'actual.':>7} {'sin camb.':>9} {'fusion.':>7} {'correg.':>7} {'rechaz.':>7}")
     for f in reversed(filas):
         print(f"{f[0]:>4}  {f[1]:<26} {f[2]:<9} {f[3]:<19} " +
-              " ".join(f"{('-' if v is None else v):>{w}}" for v, w in zip(f[4:], (7, 7, 7, 9, 7, 7))))
+              " ".join(f"{('-' if v is None else v):>{w}}" for v, w in zip(f[4:], (7, 7, 7, 9, 7, 7, 7))))
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Ingesta de los ficheros del ERP de Aurora Market")
-    parser.add_argument("modo", choices=["inicial", "delta", "fichero", "resumen"])
+    parser.add_argument("modo", choices=["inicial", "delta", "fichero", "resumen", "informe"])
     parser.add_argument("ruta", nargs="?", help="ruta del fichero (modo 'fichero')")
     parser.add_argument("--forzar", action="store_true",
                         help="reprocesa aunque el fichero ya se haya cargado")
@@ -196,6 +256,10 @@ def main() -> int:
     with conectar() as conn:
         if args.modo == "resumen":
             resumen(conn, 50)
+            return 0
+        if args.modo == "informe":
+            preparar_funciones(conn)
+            informe(conn)
             return 0
 
         preparar_funciones(conn)

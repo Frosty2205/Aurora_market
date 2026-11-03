@@ -19,6 +19,8 @@ ingesta/
 datos/                      Aquí van los 7 CSV del ERP
 evidencias/
   evidencia_ingesta.txt     Salida de la carga inicial, delta, delta repetido y delta forzado
+  delta forzado
+  informe_calidad.txt       Calidad antes/después, reglas aplicadas, deduplicación y emails
 tests/
   test_restricciones.sql    20 pruebas de restricciones (se deshacen al terminar)
 diagramas/
@@ -82,6 +84,29 @@ Idempotencia en tres niveles: fichero (hash), registro (comparación de atributo
 no se escribe nada) y estado de pedido (solo se historifica si cambia). Evidencia en
 `evidencias/evidencia_ingesta.txt`: tras repetir y forzar el delta, `core` queda idéntico
 
+## Calidad y deduplicación
+
+Las reglas de calidad viven en `control.regla_calidad` (qué se comprueba, severidad y acción:
+corregir, marcar o rechazar) y se aplican automáticamente en cada carga. Resultados:
+
+- `control.cuarentena`: registros rechazados, con la fila completa en JSON y el motivo.
+- `control.incidencia_calidad`: registros corregidos o marcados, con valor original y nuevo.
+- `control.v_resumen_reglas`: cuántos registros ha afectado cada regla.
+- `control.v_informe_calidad`: completitud, validez, unicidad, integridad y consistencia,
+  antes (staging, tal como llegó) y después (core). Se recalcula al consultarla.
+
+**Deduplicación de clientes.** Dos fichas son la misma persona si coinciden el nombre
+normalizado (minúsculas, sin tildes, z = s, ñ = n) y el teléfono (últimos 9 dígitos). Se aplica
+en cada carga, contra los clientes existentes (incluido su historial) y dentro del propio
+fichero. Prevalece la ficha más antigua; la fusionada aporta sus pedidos, los datos que le
+falten a la original y, si la tiene, la negativa de consentimiento (prudencia legal). Ambos ids
+del ERP quedan en `core.cliente_id_erp` apuntando al mismo cliente (`fusion_duplicado`).
+Resultado: 150 duplicados en la carga inicial y 6 en el delta, sin falsos positivos.
+
+**Emails con un espacio en lugar de la @** (49): se corrigen si el dominio resultante es uno
+de los habituales en los emails válidos (aparece al menos 10 veces). Si no, el email se deja
+vacío (el cliente sigue existiendo, pero no es contactable por correo).
+
 ## Pruebas
 
 Sobre una base de datos **sin datos cargados** (usa ids fijos):
@@ -118,3 +143,7 @@ Se generarón con dbdiagram.io.
 | Una transacción por fichero; reglas como consultas de conjunto | Un registro erróneo no para la carga; un fichero roto no deja datos a medias |
 | Rechazos a cuarentena con la fila completa en JSON y su motivo | Se pueden revisar y reprocesar; nada se pierde |
 | Hash de atributos para decidir si hay nueva versión de cliente | Solo cambios reales generan historial (los de formato no) |
+| Duplicado = nombre normalizado + teléfono | El email cambia con facilidad; el teléfono identifica a la persona. 156 casos, 0 falsos positivos |
+| Deduplicar en cada carga, no al final | Si el delta cambia el teléfono, a posteriori ya no coincidirían |
+| Prevalece la ficha más antigua; la otra aporta pedidos y huecos | La duplicada suele llevar erratas; los cambios posteriores entran por el historial |
+| Consentimiento: si alguna ficha dice "no", es "no" | Prudencia ante el riesgo legal de contactar sin permiso |
