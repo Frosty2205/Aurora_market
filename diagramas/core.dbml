@@ -1,0 +1,164 @@
+// Aurora Market · esquema core (modelo normalizado)
+// Generado automáticamente desde la base de datos PostgreSQL (db2dbml).
+// Pegar en https://dbdiagram.io (opción "Import > DBML" o directamente en el editor).
+
+Table "core"."pais" {
+  "codigo_pais" bpchar(2) [pk, not null]
+  "nombre" varchar(60) [unique, not null]
+}
+
+Table "core"."canal" {
+  "canal_id" int2 [pk, not null]
+  "codigo" varchar(20) [unique, not null]
+  "nombre" varchar(40) [not null]
+}
+
+Table "core"."estado_pedido" {
+  "estado_id" int2 [pk, not null]
+  "codigo" varchar(20) [unique, not null]
+  "nombre" varchar(40) [not null]
+  "es_final" bool [not null]
+  "cuenta_como_venta" bool [not null]
+}
+
+Table "core"."categoria" {
+  "categoria_id" int4 [pk, not null, increment]
+  "nombre" varchar(60) [unique, not null]
+}
+
+Table "core"."subcategoria" {
+  "subcategoria_id" int4 [pk, not null, increment]
+  "categoria_id" int4 [not null]
+  "nombre" varchar(60) [not null]
+
+  Indexes {
+    (categoria_id, nombre) [type: btree, name: "uq_subcategoria"]
+  }
+}
+
+Table "core"."producto" {
+  "producto_id" int4 [pk, not null, increment]
+  "id_producto_erp" varchar(20) [unique, not null]
+  "nombre" varchar(150) [not null]
+  "subcategoria_id" int4 [not null]
+  "marca" varchar(60)
+  "precio_lista" numeric(10,2)
+  "coste" numeric(10,2)
+  "activo" bool [not null, default: true]
+  "fecha_creacion" timestamptz [not null, default: `now()`]
+  "fecha_actualizacion" timestamptz [not null, default: `now()`]
+  "id_ejecucion" int8
+
+  Indexes {
+    subcategoria_id [type: btree, name: "ix_producto_subcategoria"]
+  }
+}
+
+Table "core"."cliente" {
+  "cliente_id" int8 [pk, not null, increment]
+  "fecha_alta" date
+  "fecha_creacion" timestamptz [not null, default: `now()`]
+  "fecha_actualizacion" timestamptz [not null, default: `now()`]
+  "id_ejecucion" int8
+}
+
+Table "core"."cliente_id_erp" {
+  "id_cliente_erp" varchar(20) [pk, not null]
+  "cliente_id" int8 [not null]
+  "motivo_asignacion" varchar(20) [not null]
+  "fecha_asignacion" timestamptz [not null, default: `now()`]
+  "id_ejecucion" int8
+
+  Indexes {
+    cliente_id [type: btree, name: "ix_cliente_id_erp_cliente"]
+  }
+}
+
+Table "core"."cliente_version" {
+  "cliente_version_id" int8 [pk, not null, increment]
+  "cliente_id" int8 [unique, not null]
+  "nombre" varchar(80) [not null]
+  "apellidos" varchar(120)
+  "email" varchar(254)
+  "telefono" varchar(20)
+  "codigo_pais" bpchar(2)
+  "ciudad" varchar(80)
+  "consentimiento_marketing" bool [note: 'true/false normalizado desde S, SI, 1 / N, NO, 0. NULL = desconocido; no se incluye en campañas.']
+  "valido_desde" timestamptz [not null]
+  "valido_hasta" timestamptz
+  "es_actual" bool [not null]
+  "hash_atributos" bpchar(32) [not null]
+  "id_ejecucion" int8
+
+  Indexes {
+    email [type: btree, name: "ix_cliente_version_email"]
+    (cliente_id, valido_desde) [type: btree, name: "ix_cliente_version_periodo"]
+  }
+}
+
+Table "core"."pedido" {
+  "pedido_id" int8 [pk, not null, increment]
+  "id_pedido_erp" varchar(20) [unique, not null]
+  "cliente_id" int8 [not null]
+  "id_cliente_erp_origen" varchar(20) [not null]
+  "fecha_pedido" timestamp [not null]
+  "canal_id" int2 [not null]
+  "estado_id" int2 [not null]
+  "importe_total_erp" numeric(12,2) [not null]
+  "fecha_creacion" timestamptz [not null, default: `now()`]
+  "fecha_actualizacion" timestamptz [not null, default: `now()`]
+  "id_ejecucion" int8
+
+  Indexes {
+    (cliente_id, fecha_pedido) [type: btree, name: "ix_pedido_cliente_fecha"]
+    id_cliente_erp_origen [type: btree, name: "ix_pedido_cliente_pendiente"]
+    fecha_pedido [type: btree, name: "ix_pedido_fecha"]
+  }
+}
+
+Table "core"."pedido_estado_hist" {
+  "historial_id" int8 [pk, not null, increment]
+  "pedido_id" int8 [unique, not null]
+  "estado_id" int2 [not null]
+  "valido_desde" timestamptz [not null]
+  "valido_hasta" timestamptz
+  "id_ejecucion" int8
+
+  Indexes {
+    (pedido_id, valido_desde) [type: btree, name: "ix_estado_hist_pedido"]
+  }
+}
+
+Table "core"."linea_pedido" {
+  "pedido_id" int8 [not null]
+  "num_linea" int2 [not null]
+  "producto_id" int4 [not null]
+  "id_producto_erp_origen" varchar(20) [not null]
+  "cantidad" int4 [not null, note: 'Cantidad válida. Si el ERP envió 0 o negativo y el importe del pedido confirma 1, se corrige a 1 (ver cantidad_original).']
+  "cantidad_original" int4 [not null]
+  "cantidad_corregida" bool
+  "precio_unitario" numeric(10,2) [not null]
+  "descuento_pct" numeric(5,2) [not null, default: 0]
+  "importe_linea" numeric(12,2)
+  "fecha_creacion" timestamptz [not null, default: `now()`]
+  "id_ejecucion" int8
+
+  Indexes {
+    (pedido_id, num_linea) [type: btree, name: "linea_pedido_pkey"]
+    producto_id [type: btree, name: "ix_linea_producto"]
+    id_producto_erp_origen [type: btree, name: "ix_linea_producto_pendiente"]
+  }
+}
+
+Ref "cliente_id_erp_cliente_id_fkey":"core"."cliente"."cliente_id" < "core"."cliente_id_erp"."cliente_id"
+Ref "cliente_version_cliente_id_fkey":"core"."cliente"."cliente_id" < "core"."cliente_version"."cliente_id"
+Ref "cliente_version_codigo_pais_fkey":"core"."pais"."codigo_pais" < "core"."cliente_version"."codigo_pais"
+Ref "linea_pedido_pedido_id_fkey":"core"."pedido"."pedido_id" < "core"."linea_pedido"."pedido_id"
+Ref "linea_pedido_producto_id_fkey":"core"."producto"."producto_id" < "core"."linea_pedido"."producto_id"
+Ref "pedido_canal_id_fkey":"core"."canal"."canal_id" < "core"."pedido"."canal_id"
+Ref "pedido_cliente_id_fkey":"core"."cliente"."cliente_id" < "core"."pedido"."cliente_id"
+Ref "pedido_estado_id_fkey":"core"."estado_pedido"."estado_id" < "core"."pedido"."estado_id"
+Ref "pedido_estado_hist_estado_id_fkey":"core"."estado_pedido"."estado_id" < "core"."pedido_estado_hist"."estado_id"
+Ref "pedido_estado_hist_pedido_id_fkey":"core"."pedido"."pedido_id" < "core"."pedido_estado_hist"."pedido_id"
+Ref "producto_subcategoria_id_fkey":"core"."subcategoria"."subcategoria_id" < "core"."producto"."subcategoria_id"
+Ref "subcategoria_categoria_id_fkey":"core"."categoria"."categoria_id" < "core"."subcategoria"."categoria_id"

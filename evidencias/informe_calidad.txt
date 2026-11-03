@@ -1,0 +1,55 @@
+## 1. Calidad antes (datos tal como llegaron) / después (core)
+entidad        dimensión     indicador                                                                         antes                después
+clientes       completitud   Email informado y con formato válido                                  95.2% (5080/5336)      97.0% (4965/5120)
+clientes       completitud   Consentimiento de marketing informado                                 91.6% (4886/5336)      91.6% (4690/5120)
+clientes       validez       Fecha de alta en formato estándar (AAAA-MM-DD)                        68.4% (3652/5336)     100.0% (5120/5120)
+clientes       validez       País en código ISO de 2 letras                                        50.4% (2688/5336)     100.0% (5120/5120)
+clientes       validez       Consentimiento en un valor único (sí/no)                              59.1% (2888/4886)     100.0% (4690/4690)
+clientes       unicidad      Fichas que corresponden a una persona distinta (sin duplicados)       97.0% (5120/5276)     100.0% (5120/5120)
+productos      completitud   Precio de lista informado                                               98.8% (397/402)        98.8% (397/402)
+pedidos        validez       Fecha de pedido en formato estándar                                 85.1% (35187/41370)   100.0% (41200/41200)
+pedidos        validez       Estado y canal con su valor estándar                                90.1% (37260/41370)   100.0% (41200/41200)
+pedidos        integridad    Pedidos de un cliente existente                                     99.6% (41196/41370)    99.6% (41027/41200)
+pedidos        consistencia  Importe del pedido igual a la suma de sus líneas                    97.8% (40273/41200)    98.9% (40742/41200)
+lineas_pedido  unicidad      Líneas sin duplicar (pedido + número de línea)                    99.7% (106076/106441) 100.0% (106026/106026)
+lineas_pedido  validez       Cantidad mayor que cero                                           99.8% (106230/106441) 100.0% (106026/106026)
+lineas_pedido  integridad    Líneas de un producto existente                                   99.8% (106230/106441)  99.8% (105815/106026)
+
+## 2. Registros afectados por cada regla (cargas no forzadas)
+acción      regla                         entidad          registros
+rechazar    LIN_DUPLICADA                 lineas_pedido          315
+rechazar    LIN_CANTIDAD_INVALIDA         lineas_pedido           50
+rechazar    LIN_CONFLICTO                 lineas_pedido            2
+corregir    GEN_FECHA_FORMATO             general               7867
+corregir    GEN_VALOR_MAPEADO             general               6826
+corregir    LIN_CANTIDAD_CORREGIDA        lineas_pedido          159
+corregir    CLI_DUPLICADO_FUSIONADO       clientes               156
+corregir    CLI_EMAIL_CORREGIDO           clientes                49
+marcar      PED_IMPORTE_DESCUADRE         pedidos                458
+marcar      CLI_CONSENT_DESCONOCIDO       clientes               450
+marcar      LIN_PRODUCTO_DESCONOCIDO      lineas_pedido          211
+marcar      PED_CLIENTE_DESCONOCIDO       pedidos                174
+marcar      CLI_EMAIL_VACIO               clientes               162
+marcar      PRD_PRECIO_VACIO              productos                5
+
+## 3. Deduplicación de clientes (mismo nombre normalizado + teléfono)
+fichero                  fichas fusionadas
+clientes_delta.csv                       6
+clientes_erp.csv                       150
+Resultado: 5276 ids del ERP -> 5120 clientes únicos.
+
+## 3b. Ejemplos (la ficha fusionada se une a la más antigua)
+id fusionado    cliente                       id que prevalece     pedidos totales
+C005001         Ana Serrano Romero            C000221                            4
+C005002         Carlos Domínguez Ramos        C002822                            6
+C005003         Diego Vázquez Marín           C001689                           14
+C005004         David Marín Domínguez         C004616                           19
+C005005         Óscar Díaz López              C003437                            3
+
+## 4. Emails corregidos (espacio en lugar de @ y dominio habitual): 49
+original                            corregido                         
+adrian.ramos3163 yahoo.es           adrian.ramos3163@yahoo.es         
+adrian.serrano4613 outlook.com      adrian.serrano4613@outlook.com    
+alba.iglesias8747 gmail.com         alba.iglesias8747@gmail.com       
+alvaro.diaz9708 gmail.com           alvaro.diaz9708@gmail.com         
+alvaro.torres9796 outlook.com       alvaro.torres9796@outlook.com     

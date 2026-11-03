@@ -1,0 +1,159 @@
+// Aurora Market · esquema consume (estrella y resultados)
+// Generado automáticamente desde la base de datos PostgreSQL (db2dbml).
+// Pegar en https://dbdiagram.io (opción "Import > DBML" o directamente en el editor).
+
+Table "consume"."dim_fecha" {
+  "fecha_id" int4 [pk, not null]
+  "fecha" date [unique, not null]
+  "anio" int2 [not null]
+  "trimestre" int2 [not null]
+  "mes" int2 [not null]
+  "nombre_mes" varchar(12) [not null]
+  "semana_iso" int2 [not null]
+  "dia_semana" int2 [not null]
+  "nombre_dia" varchar(12) [not null]
+  "es_fin_semana" bool [not null]
+}
+
+Table "consume"."dim_canal" {
+  "canal_id" int2 [pk, not null]
+  "codigo" varchar(20) [unique, not null]
+  "nombre" varchar(40) [not null]
+}
+
+Table "consume"."dim_cliente" {
+  "cliente_id" int8 [pk, not null]
+  "nombre" varchar(80) [not null]
+  "apellidos" varchar(120)
+  "nombre_completo" varchar(201) [not null]
+  "email" varchar(254)
+  "codigo_pais" bpchar(2)
+  "pais" varchar(60)
+  "ciudad" varchar(80)
+  "fecha_alta" date
+  "consentimiento_marketing" bool
+  "segmento_actual" varchar(40)
+  "fecha_actualizacion" timestamptz [not null, default: `now()`]
+}
+
+Table "consume"."dim_producto" {
+  "producto_id" int4 [pk, not null]
+  "id_producto_erp" varchar(20) [unique, not null]
+  "nombre" varchar(150) [not null]
+  "categoria" varchar(60) [not null]
+  "subcategoria" varchar(60) [not null]
+  "marca" varchar(60)
+  "precio_lista" numeric(10,2)
+  "coste" numeric(10,2)
+  "activo" bool [not null]
+  "fecha_actualizacion" timestamptz [not null, default: `now()`]
+}
+
+Table "consume"."fact_ventas" {
+  "pedido_id" int8 [not null]
+  "num_linea" int2 [not null]
+  "fecha_id" int4 [not null]
+  "cliente_id" int8 [not null]
+  "producto_id" int4 [not null]
+  "canal_id" int2 [not null]
+  "id_pedido_erp" varchar(20) [not null]
+  "estado_pedido" varchar(20) [not null]
+  "es_venta_valida" bool [not null]
+  "cantidad" int4 [not null]
+  "precio_unitario" numeric(10,2) [not null]
+  "descuento_pct" numeric(5,2) [not null]
+  "importe_bruto" numeric(12,2) [not null]
+  "importe_descuento" numeric(12,2) [not null]
+  "importe_neto" numeric(12,2) [not null]
+  "coste_total" numeric(12,2) [note: 'Se calcula con el coste actual del producto: el ERP no aporta coste histórico.']
+  "margen" numeric(12,2)
+
+  Indexes {
+    (pedido_id, num_linea) [type: btree, name: "fact_ventas_pkey"]
+    cliente_id [type: btree, name: "ix_fact_ventas_cliente"]
+    fecha_id [type: btree, name: "ix_fact_ventas_fecha"]
+    producto_id [type: btree, name: "ix_fact_ventas_producto"]
+  }
+}
+
+Table "consume"."segmento" {
+  "segmento_id" int2 [pk, not null]
+  "codigo" varchar(30) [unique, not null]
+  "nombre" varchar(40) [unique, not null]
+  "descripcion" varchar(300) [not null]
+  "criterio" varchar(300) [not null]
+  "accion_recomendada" varchar(300) [not null]
+  "prioridad" int2 [unique, not null]
+}
+
+Table "consume"."cliente_rfm" {
+  "cliente_id" int8 [not null]
+  "fecha_calculo" date [not null]
+  "recencia_dias" int4 [not null]
+  "frecuencia" int4 [not null]
+  "valor_monetario" numeric(12,2) [not null]
+  "r_score" int2 [not null]
+  "f_score" int2 [not null]
+  "m_score" int2 [not null]
+  "segmento_id" int2 [not null]
+
+  Indexes {
+    (cliente_id, fecha_calculo) [type: btree, name: "cliente_rfm_pkey"]
+    (fecha_calculo, segmento_id) [type: btree, name: "ix_rfm_fecha_segmento"]
+  }
+}
+
+Table "consume"."recomendacion" {
+  "cliente_id" int8 [not null]
+  "fecha_calculo" date [not null]
+  "ranking" int2 [not null]
+  "producto_id" int4 [not null]
+  "motivo" varchar(200) [not null]
+  "puntuacion" numeric(8,4) [not null]
+
+  Indexes {
+    (cliente_id, fecha_calculo, ranking) [type: btree, name: "recomendacion_pkey"]
+    (cliente_id, fecha_calculo, producto_id) [type: btree, name: "uq_recomendacion_producto"]
+    producto_id [type: btree, name: "ix_recomendacion_producto"]
+  }
+}
+
+Table "consume"."cliente_360" {
+  "cliente_id" int8 [pk, not null]
+  "num_pedidos" int4 [not null]
+  "importe_total" numeric(12,2) [not null]
+  "ticket_medio" numeric(12,2)
+  "fecha_primera_compra" date
+  "fecha_ultima_compra" date
+  "categoria_principal" varchar(60)
+  "canal_principal" varchar(40)
+  "segmento" varchar(40)
+  "consentimiento_marketing" bool
+  "fecha_calculo" date [not null]
+}
+
+Table "consume"."audiencia_campana" {
+  "campana_id" varchar(40) [not null]
+  "cliente_id" int8 [not null]
+  "fecha_generacion" date [not null]
+  "email" varchar(254) [not null]
+  "segmento" varchar(40)
+  "producto_recomendado_id" int4
+
+  Indexes {
+    (campana_id, cliente_id) [type: btree, name: "audiencia_campana_pkey"]
+    cliente_id [type: btree, name: "ix_audiencia_cliente"]
+  }
+}
+
+Ref "audiencia_campana_cliente_id_fkey":"consume"."dim_cliente"."cliente_id" < "consume"."audiencia_campana"."cliente_id"
+Ref "audiencia_campana_producto_recomendado_id_fkey":"consume"."dim_producto"."producto_id" < "consume"."audiencia_campana"."producto_recomendado_id"
+Ref "cliente_360_cliente_id_fkey":"consume"."dim_cliente"."cliente_id" < "consume"."cliente_360"."cliente_id"
+Ref "cliente_rfm_cliente_id_fkey":"consume"."dim_cliente"."cliente_id" < "consume"."cliente_rfm"."cliente_id"
+Ref "cliente_rfm_segmento_id_fkey":"consume"."segmento"."segmento_id" < "consume"."cliente_rfm"."segmento_id"
+Ref "fact_ventas_canal_id_fkey":"consume"."dim_canal"."canal_id" < "consume"."fact_ventas"."canal_id"
+Ref "fact_ventas_cliente_id_fkey":"consume"."dim_cliente"."cliente_id" < "consume"."fact_ventas"."cliente_id"
+Ref "fact_ventas_fecha_id_fkey":"consume"."dim_fecha"."fecha_id" < "consume"."fact_ventas"."fecha_id"
+Ref "fact_ventas_producto_id_fkey":"consume"."dim_producto"."producto_id" < "consume"."fact_ventas"."producto_id"
+Ref "recomendacion_cliente_id_fkey":"consume"."dim_cliente"."cliente_id" < "consume"."recomendacion"."cliente_id"
+Ref "recomendacion_producto_id_fkey":"consume"."dim_producto"."producto_id" < "consume"."recomendacion"."producto_id"

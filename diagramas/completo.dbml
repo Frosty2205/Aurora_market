@@ -1,0 +1,490 @@
+// Aurora Market · modelo completo (4 esquemas)
+// Generado automáticamente desde la base de datos PostgreSQL (db2dbml).
+// Pegar en https://dbdiagram.io (opción "Import > DBML" o directamente en el editor).
+
+Table "consume"."dim_fecha" {
+  "fecha_id" int4 [pk, not null]
+  "fecha" date [unique, not null]
+  "anio" int2 [not null]
+  "trimestre" int2 [not null]
+  "mes" int2 [not null]
+  "nombre_mes" varchar(12) [not null]
+  "semana_iso" int2 [not null]
+  "dia_semana" int2 [not null]
+  "nombre_dia" varchar(12) [not null]
+  "es_fin_semana" bool [not null]
+}
+
+Table "consume"."dim_canal" {
+  "canal_id" int2 [pk, not null]
+  "codigo" varchar(20) [unique, not null]
+  "nombre" varchar(40) [not null]
+}
+
+Table "consume"."dim_cliente" {
+  "cliente_id" int8 [pk, not null]
+  "nombre" varchar(80) [not null]
+  "apellidos" varchar(120)
+  "nombre_completo" varchar(201) [not null]
+  "email" varchar(254)
+  "codigo_pais" bpchar(2)
+  "pais" varchar(60)
+  "ciudad" varchar(80)
+  "fecha_alta" date
+  "consentimiento_marketing" bool
+  "segmento_actual" varchar(40)
+  "fecha_actualizacion" timestamptz [not null, default: `now()`]
+}
+
+Table "consume"."dim_producto" {
+  "producto_id" int4 [pk, not null]
+  "id_producto_erp" varchar(20) [unique, not null]
+  "nombre" varchar(150) [not null]
+  "categoria" varchar(60) [not null]
+  "subcategoria" varchar(60) [not null]
+  "marca" varchar(60)
+  "precio_lista" numeric(10,2)
+  "coste" numeric(10,2)
+  "activo" bool [not null]
+  "fecha_actualizacion" timestamptz [not null, default: `now()`]
+}
+
+Table "consume"."fact_ventas" {
+  "pedido_id" int8 [not null]
+  "num_linea" int2 [not null]
+  "fecha_id" int4 [not null]
+  "cliente_id" int8 [not null]
+  "producto_id" int4 [not null]
+  "canal_id" int2 [not null]
+  "id_pedido_erp" varchar(20) [not null]
+  "estado_pedido" varchar(20) [not null]
+  "es_venta_valida" bool [not null]
+  "cantidad" int4 [not null]
+  "precio_unitario" numeric(10,2) [not null]
+  "descuento_pct" numeric(5,2) [not null]
+  "importe_bruto" numeric(12,2) [not null]
+  "importe_descuento" numeric(12,2) [not null]
+  "importe_neto" numeric(12,2) [not null]
+  "coste_total" numeric(12,2) [note: 'Se calcula con el coste actual del producto: el ERP no aporta coste histórico.']
+  "margen" numeric(12,2)
+
+  Indexes {
+    (pedido_id, num_linea) [type: btree, name: "fact_ventas_pkey"]
+    cliente_id [type: btree, name: "ix_fact_ventas_cliente"]
+    fecha_id [type: btree, name: "ix_fact_ventas_fecha"]
+    producto_id [type: btree, name: "ix_fact_ventas_producto"]
+  }
+}
+
+Table "consume"."segmento" {
+  "segmento_id" int2 [pk, not null]
+  "codigo" varchar(30) [unique, not null]
+  "nombre" varchar(40) [unique, not null]
+  "descripcion" varchar(300) [not null]
+  "criterio" varchar(300) [not null]
+  "accion_recomendada" varchar(300) [not null]
+  "prioridad" int2 [unique, not null]
+}
+
+Table "consume"."cliente_rfm" {
+  "cliente_id" int8 [not null]
+  "fecha_calculo" date [not null]
+  "recencia_dias" int4 [not null]
+  "frecuencia" int4 [not null]
+  "valor_monetario" numeric(12,2) [not null]
+  "r_score" int2 [not null]
+  "f_score" int2 [not null]
+  "m_score" int2 [not null]
+  "segmento_id" int2 [not null]
+
+  Indexes {
+    (cliente_id, fecha_calculo) [type: btree, name: "cliente_rfm_pkey"]
+    (fecha_calculo, segmento_id) [type: btree, name: "ix_rfm_fecha_segmento"]
+  }
+}
+
+Table "consume"."recomendacion" {
+  "cliente_id" int8 [not null]
+  "fecha_calculo" date [not null]
+  "ranking" int2 [not null]
+  "producto_id" int4 [not null]
+  "motivo" varchar(200) [not null]
+  "puntuacion" numeric(8,4) [not null]
+
+  Indexes {
+    (cliente_id, fecha_calculo, ranking) [type: btree, name: "recomendacion_pkey"]
+    (cliente_id, fecha_calculo, producto_id) [type: btree, name: "uq_recomendacion_producto"]
+    producto_id [type: btree, name: "ix_recomendacion_producto"]
+  }
+}
+
+Table "consume"."cliente_360" {
+  "cliente_id" int8 [pk, not null]
+  "num_pedidos" int4 [not null]
+  "importe_total" numeric(12,2) [not null]
+  "ticket_medio" numeric(12,2)
+  "fecha_primera_compra" date
+  "fecha_ultima_compra" date
+  "categoria_principal" varchar(60)
+  "canal_principal" varchar(40)
+  "segmento" varchar(40)
+  "consentimiento_marketing" bool
+  "fecha_calculo" date [not null]
+}
+
+Table "consume"."audiencia_campana" {
+  "campana_id" varchar(40) [not null]
+  "cliente_id" int8 [not null]
+  "fecha_generacion" date [not null]
+  "email" varchar(254) [not null]
+  "segmento" varchar(40)
+  "producto_recomendado_id" int4
+
+  Indexes {
+    (campana_id, cliente_id) [type: btree, name: "audiencia_campana_pkey"]
+    cliente_id [type: btree, name: "ix_audiencia_cliente"]
+  }
+}
+
+Table "control"."ejecucion" {
+  "id_ejecucion" int8 [pk, not null, increment]
+  "fichero_origen" varchar(255) [not null]
+  "entidad" varchar(30) [not null]
+  "tipo_carga" varchar(10) [not null]
+  "hash_fichero" bpchar(64) [unique, not null]
+  "estado" varchar(15) [not null, default: 'en_curso']
+  "fecha_inicio" timestamptz [not null, default: `now()`]
+  "fecha_fin" timestamptz
+  "filas_leidas" int4
+  "filas_insertadas" int4
+  "filas_actualizadas" int4
+  "filas_sin_cambios" int4
+  "filas_corregidas" int4
+  "filas_rechazadas" int4
+  "mensaje_error" text
+  Note: 'Registro de cada fichero procesado, con su hash, estado y contadores.'
+}
+
+Table "control"."mapeo_valores" {
+  "dominio" varchar(30) [not null]
+  "valor_origen" varchar(100) [not null]
+  "valor_normalizado" varchar(100) [not null]
+
+  Indexes {
+    (dominio, valor_origen) [type: btree, name: "mapeo_valores_pkey"]
+  }
+  Note: 'Tabla de normalización: España/ESP/Spain -> ES, Teléfono/Telefono -> TELEFONO, S/SI/1 -> true...'
+}
+
+Table "control"."regla_calidad" {
+  "regla_id" varchar(40) [pk, not null]
+  "entidad" varchar(30) [not null]
+  "descripcion" varchar(300) [not null]
+  "severidad" varchar(10) [not null]
+  "accion" varchar(10) [not null]
+  "activa" bool [not null, default: true]
+}
+
+Table "control"."incidencia_calidad" {
+  "incidencia_id" int8 [pk, not null, increment]
+  "id_ejecucion" int8 [not null]
+  "regla_id" varchar(40) [not null]
+  "entidad" varchar(30) [not null]
+  "clave_registro" varchar(100) [not null]
+  "num_fila" int4
+  "campo" varchar(50)
+  "valor_original" text
+  "valor_nuevo" text
+  "fecha_registro" timestamptz [not null, default: `now()`]
+
+  Indexes {
+    id_ejecucion [type: btree, name: "ix_incidencia_ejecucion"]
+    regla_id [type: btree, name: "ix_incidencia_regla"]
+  }
+}
+
+Table "control"."cuarentena" {
+  "cuarentena_id" int8 [pk, not null, increment]
+  "id_ejecucion" int8 [not null]
+  "regla_id" varchar(40) [not null]
+  "entidad" varchar(30) [not null]
+  "fichero_origen" varchar(255) [not null]
+  "num_fila" int4 [not null]
+  "registro" jsonb [not null]
+  "motivo" text [not null]
+  "reprocesado" bool [not null, default: false]
+  "fecha_registro" timestamptz [not null, default: `now()`]
+
+  Indexes {
+    id_ejecucion [type: btree, name: "ix_cuarentena_ejecucion"]
+    entidad [type: btree, name: "ix_cuarentena_pendiente"]
+  }
+}
+
+Table "core"."pais" {
+  "codigo_pais" bpchar(2) [pk, not null]
+  "nombre" varchar(60) [unique, not null]
+}
+
+Table "core"."canal" {
+  "canal_id" int2 [pk, not null]
+  "codigo" varchar(20) [unique, not null]
+  "nombre" varchar(40) [not null]
+}
+
+Table "core"."estado_pedido" {
+  "estado_id" int2 [pk, not null]
+  "codigo" varchar(20) [unique, not null]
+  "nombre" varchar(40) [not null]
+  "es_final" bool [not null]
+  "cuenta_como_venta" bool [not null]
+}
+
+Table "core"."categoria" {
+  "categoria_id" int4 [pk, not null, increment]
+  "nombre" varchar(60) [unique, not null]
+}
+
+Table "core"."subcategoria" {
+  "subcategoria_id" int4 [pk, not null, increment]
+  "categoria_id" int4 [not null]
+  "nombre" varchar(60) [not null]
+
+  Indexes {
+    (categoria_id, nombre) [type: btree, name: "uq_subcategoria"]
+  }
+}
+
+Table "core"."producto" {
+  "producto_id" int4 [pk, not null, increment]
+  "id_producto_erp" varchar(20) [unique, not null]
+  "nombre" varchar(150) [not null]
+  "subcategoria_id" int4 [not null]
+  "marca" varchar(60)
+  "precio_lista" numeric(10,2)
+  "coste" numeric(10,2)
+  "activo" bool [not null, default: true]
+  "fecha_creacion" timestamptz [not null, default: `now()`]
+  "fecha_actualizacion" timestamptz [not null, default: `now()`]
+  "id_ejecucion" int8
+
+  Indexes {
+    subcategoria_id [type: btree, name: "ix_producto_subcategoria"]
+  }
+}
+
+Table "core"."cliente" {
+  "cliente_id" int8 [pk, not null, increment]
+  "fecha_alta" date
+  "fecha_creacion" timestamptz [not null, default: `now()`]
+  "fecha_actualizacion" timestamptz [not null, default: `now()`]
+  "id_ejecucion" int8
+}
+
+Table "core"."cliente_id_erp" {
+  "id_cliente_erp" varchar(20) [pk, not null]
+  "cliente_id" int8 [not null]
+  "motivo_asignacion" varchar(20) [not null]
+  "fecha_asignacion" timestamptz [not null, default: `now()`]
+  "id_ejecucion" int8
+
+  Indexes {
+    cliente_id [type: btree, name: "ix_cliente_id_erp_cliente"]
+  }
+}
+
+Table "core"."cliente_version" {
+  "cliente_version_id" int8 [pk, not null, increment]
+  "cliente_id" int8 [unique, not null]
+  "nombre" varchar(80) [not null]
+  "apellidos" varchar(120)
+  "email" varchar(254)
+  "telefono" varchar(20)
+  "codigo_pais" bpchar(2)
+  "ciudad" varchar(80)
+  "consentimiento_marketing" bool [note: 'true/false normalizado desde S, SI, 1 / N, NO, 0. NULL = desconocido; no se incluye en campañas.']
+  "valido_desde" timestamptz [not null]
+  "valido_hasta" timestamptz
+  "es_actual" bool [not null]
+  "hash_atributos" bpchar(32) [not null]
+  "id_ejecucion" int8
+
+  Indexes {
+    email [type: btree, name: "ix_cliente_version_email"]
+    (cliente_id, valido_desde) [type: btree, name: "ix_cliente_version_periodo"]
+  }
+}
+
+Table "core"."pedido" {
+  "pedido_id" int8 [pk, not null, increment]
+  "id_pedido_erp" varchar(20) [unique, not null]
+  "cliente_id" int8 [not null]
+  "id_cliente_erp_origen" varchar(20) [not null]
+  "fecha_pedido" timestamp [not null]
+  "canal_id" int2 [not null]
+  "estado_id" int2 [not null]
+  "importe_total_erp" numeric(12,2) [not null]
+  "fecha_creacion" timestamptz [not null, default: `now()`]
+  "fecha_actualizacion" timestamptz [not null, default: `now()`]
+  "id_ejecucion" int8
+
+  Indexes {
+    (cliente_id, fecha_pedido) [type: btree, name: "ix_pedido_cliente_fecha"]
+    id_cliente_erp_origen [type: btree, name: "ix_pedido_cliente_pendiente"]
+    fecha_pedido [type: btree, name: "ix_pedido_fecha"]
+  }
+}
+
+Table "core"."pedido_estado_hist" {
+  "historial_id" int8 [pk, not null, increment]
+  "pedido_id" int8 [unique, not null]
+  "estado_id" int2 [not null]
+  "valido_desde" timestamptz [not null]
+  "valido_hasta" timestamptz
+  "id_ejecucion" int8
+
+  Indexes {
+    (pedido_id, valido_desde) [type: btree, name: "ix_estado_hist_pedido"]
+  }
+}
+
+Table "core"."linea_pedido" {
+  "pedido_id" int8 [not null]
+  "num_linea" int2 [not null]
+  "producto_id" int4 [not null]
+  "id_producto_erp_origen" varchar(20) [not null]
+  "cantidad" int4 [not null, note: 'Cantidad válida. Si el ERP envió 0 o negativo y el importe del pedido confirma 1, se corrige a 1 (ver cantidad_original).']
+  "cantidad_original" int4 [not null]
+  "cantidad_corregida" bool
+  "precio_unitario" numeric(10,2) [not null]
+  "descuento_pct" numeric(5,2) [not null, default: 0]
+  "importe_linea" numeric(12,2)
+  "fecha_creacion" timestamptz [not null, default: `now()`]
+  "id_ejecucion" int8
+
+  Indexes {
+    (pedido_id, num_linea) [type: btree, name: "linea_pedido_pkey"]
+    producto_id [type: btree, name: "ix_linea_producto"]
+    id_producto_erp_origen [type: btree, name: "ix_linea_producto_pendiente"]
+  }
+}
+
+Table "staging"."clientes" {
+  "id_ejecucion" int8 [not null]
+  "num_fila" int4 [not null]
+  "fichero_origen" varchar(255) [not null]
+  "fecha_carga" timestamptz [not null, default: `now()`]
+  "hash_fila" bpchar(32) [not null]
+  "id_cliente" text
+  "nombre" text
+  "apellidos" text
+  "email" text
+  "telefono" text
+  "pais" text
+  "ciudad" text
+  "fecha_alta" text
+  "consentimiento_marketing" text
+
+  Indexes {
+    (id_ejecucion, num_fila) [type: btree, name: "clientes_pkey"]
+  }
+  Note: 'Espejo de clientes_erp.csv y clientes_delta.csv.'
+}
+
+Table "staging"."productos" {
+  "id_ejecucion" int8 [not null]
+  "num_fila" int4 [not null]
+  "fichero_origen" varchar(255) [not null]
+  "fecha_carga" timestamptz [not null, default: `now()`]
+  "hash_fila" bpchar(32) [not null]
+  "id_producto" text
+  "nombre" text
+  "categoria" text
+  "subcategoria" text
+  "marca" text
+  "precio_lista" text
+  "coste" text
+  "activo" text
+
+  Indexes {
+    (id_ejecucion, num_fila) [type: btree, name: "productos_pkey"]
+  }
+  Note: 'Espejo de productos_erp.csv.'
+}
+
+Table "staging"."pedidos" {
+  "id_ejecucion" int8 [not null]
+  "num_fila" int4 [not null]
+  "fichero_origen" varchar(255) [not null]
+  "fecha_carga" timestamptz [not null, default: `now()`]
+  "hash_fila" bpchar(32) [not null]
+  "id_pedido" text
+  "id_cliente" text
+  "fecha_pedido" text
+  "estado" text
+  "canal" text
+  "importe_total_erp" text
+
+  Indexes {
+    (id_ejecucion, num_fila) [type: btree, name: "pedidos_pkey"]
+  }
+  Note: 'Espejo de pedidos_erp.csv y pedidos_delta.csv.'
+}
+
+Table "staging"."lineas_pedido" {
+  "id_ejecucion" int8 [not null]
+  "num_fila" int4 [not null]
+  "fichero_origen" varchar(255) [not null]
+  "fecha_carga" timestamptz [not null, default: `now()`]
+  "hash_fila" bpchar(32) [not null]
+  "id_pedido" text
+  "num_linea" text
+  "id_producto" text
+  "cantidad" text
+  "precio_unitario" text
+  "descuento_pct" text
+
+  Indexes {
+    (id_ejecucion, num_fila) [type: btree, name: "lineas_pedido_pkey"]
+  }
+  Note: 'Espejo de lineas_pedido_erp.csv y lineas_pedido_delta.csv.'
+}
+
+Ref "audiencia_campana_cliente_id_fkey":"consume"."dim_cliente"."cliente_id" < "consume"."audiencia_campana"."cliente_id"
+Ref "audiencia_campana_producto_recomendado_id_fkey":"consume"."dim_producto"."producto_id" < "consume"."audiencia_campana"."producto_recomendado_id"
+Ref "cliente_360_cliente_id_fkey":"consume"."dim_cliente"."cliente_id" < "consume"."cliente_360"."cliente_id"
+Ref "cliente_rfm_cliente_id_fkey":"consume"."dim_cliente"."cliente_id" < "consume"."cliente_rfm"."cliente_id"
+Ref "cliente_rfm_segmento_id_fkey":"consume"."segmento"."segmento_id" < "consume"."cliente_rfm"."segmento_id"
+Ref "fact_ventas_canal_id_fkey":"consume"."dim_canal"."canal_id" < "consume"."fact_ventas"."canal_id"
+Ref "fact_ventas_cliente_id_fkey":"consume"."dim_cliente"."cliente_id" < "consume"."fact_ventas"."cliente_id"
+Ref "fact_ventas_fecha_id_fkey":"consume"."dim_fecha"."fecha_id" < "consume"."fact_ventas"."fecha_id"
+Ref "fact_ventas_producto_id_fkey":"consume"."dim_producto"."producto_id" < "consume"."fact_ventas"."producto_id"
+Ref "recomendacion_cliente_id_fkey":"consume"."dim_cliente"."cliente_id" < "consume"."recomendacion"."cliente_id"
+Ref "recomendacion_producto_id_fkey":"consume"."dim_producto"."producto_id" < "consume"."recomendacion"."producto_id"
+Ref "cuarentena_id_ejecucion_fkey":"control"."ejecucion"."id_ejecucion" < "control"."cuarentena"."id_ejecucion"
+Ref "cuarentena_regla_id_fkey":"control"."regla_calidad"."regla_id" < "control"."cuarentena"."regla_id"
+Ref "incidencia_calidad_id_ejecucion_fkey":"control"."ejecucion"."id_ejecucion" < "control"."incidencia_calidad"."id_ejecucion"
+Ref "incidencia_calidad_regla_id_fkey":"control"."regla_calidad"."regla_id" < "control"."incidencia_calidad"."regla_id"
+Ref "cliente_id_ejecucion_fkey":"control"."ejecucion"."id_ejecucion" < "core"."cliente"."id_ejecucion"
+Ref "cliente_id_erp_cliente_id_fkey":"core"."cliente"."cliente_id" < "core"."cliente_id_erp"."cliente_id"
+Ref "cliente_id_erp_id_ejecucion_fkey":"control"."ejecucion"."id_ejecucion" < "core"."cliente_id_erp"."id_ejecucion"
+Ref "cliente_version_cliente_id_fkey":"core"."cliente"."cliente_id" < "core"."cliente_version"."cliente_id"
+Ref "cliente_version_codigo_pais_fkey":"core"."pais"."codigo_pais" < "core"."cliente_version"."codigo_pais"
+Ref "cliente_version_id_ejecucion_fkey":"control"."ejecucion"."id_ejecucion" < "core"."cliente_version"."id_ejecucion"
+Ref "linea_pedido_id_ejecucion_fkey":"control"."ejecucion"."id_ejecucion" < "core"."linea_pedido"."id_ejecucion"
+Ref "linea_pedido_pedido_id_fkey":"core"."pedido"."pedido_id" < "core"."linea_pedido"."pedido_id"
+Ref "linea_pedido_producto_id_fkey":"core"."producto"."producto_id" < "core"."linea_pedido"."producto_id"
+Ref "pedido_canal_id_fkey":"core"."canal"."canal_id" < "core"."pedido"."canal_id"
+Ref "pedido_cliente_id_fkey":"core"."cliente"."cliente_id" < "core"."pedido"."cliente_id"
+Ref "pedido_estado_id_fkey":"core"."estado_pedido"."estado_id" < "core"."pedido"."estado_id"
+Ref "pedido_id_ejecucion_fkey":"control"."ejecucion"."id_ejecucion" < "core"."pedido"."id_ejecucion"
+Ref "pedido_estado_hist_estado_id_fkey":"core"."estado_pedido"."estado_id" < "core"."pedido_estado_hist"."estado_id"
+Ref "pedido_estado_hist_id_ejecucion_fkey":"control"."ejecucion"."id_ejecucion" < "core"."pedido_estado_hist"."id_ejecucion"
+Ref "pedido_estado_hist_pedido_id_fkey":"core"."pedido"."pedido_id" < "core"."pedido_estado_hist"."pedido_id"
+Ref "producto_id_ejecucion_fkey":"control"."ejecucion"."id_ejecucion" < "core"."producto"."id_ejecucion"
+Ref "producto_subcategoria_id_fkey":"core"."subcategoria"."subcategoria_id" < "core"."producto"."subcategoria_id"
+Ref "subcategoria_categoria_id_fkey":"core"."categoria"."categoria_id" < "core"."subcategoria"."categoria_id"
+Ref "clientes_id_ejecucion_fkey":"control"."ejecucion"."id_ejecucion" < "staging"."clientes"."id_ejecucion"
+Ref "lineas_pedido_id_ejecucion_fkey":"control"."ejecucion"."id_ejecucion" < "staging"."lineas_pedido"."id_ejecucion"
+Ref "pedidos_id_ejecucion_fkey":"control"."ejecucion"."id_ejecucion" < "staging"."pedidos"."id_ejecucion"
+Ref "productos_id_ejecucion_fkey":"control"."ejecucion"."id_ejecucion" < "staging"."productos"."id_ejecucion"

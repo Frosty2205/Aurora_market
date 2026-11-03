@@ -7,6 +7,7 @@ Uso:
     python ingesta.py fichero RUTA [--forzar]  # un fichero suelto (entidad y tipo por el nombre)
     python ingesta.py resumen                  # últimas ejecuciones registradas
     python ingesta.py informe                  # informe de calidad antes / después
+    python ingesta.py procesar                 # recalcula la capa de consumo (360, RFM, recomendaciones, audiencia)
 
 Python solo hace tres cosas: calcular el hash del fichero, copiarlo a staging con
 COPY y llamar a la función SQL de su entidad. Toda la transformación es SQL.
@@ -35,6 +36,7 @@ import psycopg
 
 DATOS_DIR = Path(os.environ.get("DATOS_DIR", "/datos"))
 SQL_DIR = Path(os.environ.get("SQL_DIR", "/app/sql"))
+
 
 # Entidad -> columnas esperadas en el CSV y función SQL que la carga
 ENTIDADES = {
@@ -96,11 +98,32 @@ def conectar() -> psycopg.Connection:
 
 
 def preparar_funciones(conn: psycopg.Connection) -> None:
-    """Aplica las funciones de carga y vistas de calidad (scripts 06 en adelante).
+    """Aplica las funciones de carga, las vistas de calidad y el procesamiento (06 en adelante).
     Son re-ejecutables (CREATE OR REPLACE): siempre se usa la versión actual."""
     for script in sorted(SQL_DIR.glob("0[6-9]_*.sql")):
         conn.execute(script.read_text(encoding="utf-8"))
     conn.commit()
+
+
+def procesar_consumo(conn) -> None:
+    """Recalcula la capa de consumo: 360, RFM, recomendaciones y audiencia."""
+    filas = conn.execute("SELECT * FROM consume.refrescar()").fetchall()
+    conn.commit()
+    print("Procesamiento de la capa de consumo:")
+    for tabla, n in filas:
+        print(f"  {tabla:<52} {'' if n is None else n:>8}")
+    segmentos = conn.execute("""
+        SELECT s.nombre, count(c.cliente_id), round(100.0 * count(c.cliente_id) / sum(count(c.cliente_id)) OVER (), 1),
+               coalesce(round(sum(c.importe_total)), 0),
+               count(a.cliente_id)
+        FROM consume.segmento s
+        LEFT JOIN consume.cliente_360 c ON c.segmento = s.nombre
+        LEFT JOIN consume.audiencia_campana a ON a.cliente_id = c.cliente_id
+              AND a.campana_id = (SELECT max(campana_id) FROM consume.audiencia_campana)
+        GROUP BY s.nombre, s.prioridad ORDER BY s.prioridad""").fetchall()
+    print(f"\n  {'segmento':<20} {'clientes':>9} {'%':>6} {'importe (€)':>12} {'en audiencia':>13}")
+    for nombre, n, pct, imp, aud in segmentos:
+        print(f"  {nombre:<20} {n:>9} {pct:>6} {imp:>12} {aud:>13}")
 
 
 def informe(conn) -> None:
@@ -247,7 +270,7 @@ def resumen(conn, limite: int = 10) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Ingesta de los ficheros del ERP de Aurora Market")
-    parser.add_argument("modo", choices=["inicial", "delta", "fichero", "resumen", "informe"])
+    parser.add_argument("modo", choices=["inicial", "delta", "fichero", "resumen", "informe", "procesar"])
     parser.add_argument("ruta", nargs="?", help="ruta del fichero (modo 'fichero')")
     parser.add_argument("--forzar", action="store_true",
                         help="reprocesa aunque el fichero ya se haya cargado")
@@ -260,6 +283,10 @@ def main() -> int:
         if args.modo == "informe":
             preparar_funciones(conn)
             informe(conn)
+            return 0
+        if args.modo == "procesar":
+            preparar_funciones(conn)
+            procesar_consumo(conn)
             return 0
 
         preparar_funciones(conn)

@@ -10,7 +10,7 @@ sql/
   01_control.sql            Ejecuciones, mapeos, reglas de calidad, incidencias y cuarentena
   02_staging.sql            Espejo de los CSV (todo TEXT) + trazabilidad
   03_core.sql               Modelo normalizado: clientes (SCD2), productos, pedidos, líneas
-  04_consumo.sql            Estrella (fact_ventas + dimensiones) y resultados analíticos
+  04_consume.sql            Estrella (fact_ventas + dimensiones) y resultados analíticos
   05_datos_referencia.sql   Catálogos, mapeos, reglas, registros -1 y calendario
   06_funciones_ingesta.sql  Funciones SQL de carga staging -> core (una por entidad)
 ingesta/
@@ -19,12 +19,13 @@ ingesta/
 datos/                      Aquí van los 7 CSV del ERP
 evidencias/
   evidencia_ingesta.txt     Salida de la carga inicial, delta, delta repetido y delta forzado
-  delta forzado
   informe_calidad.txt       Calidad antes/después, reglas aplicadas, deduplicación y emails
+  evidencia_procesamiento.txt   Resultado del procesamiento, segmentos, ejemplo y comprobaciones
 tests/
   test_restricciones.sql    20 pruebas de restricciones (se deshacen al terminar)
 diagramas/
-  core.dbml, consumo.dbml, completo.dbml   Para dbdiagram.io
+  core.dbml, consume.dbml, completo.dbml   Para dbdiagram.io
+  diagrama_logico_completo.png, diagrama_logico_consume.png, diagrama_logico_core.png   En versión imagen de lo que da de los dbml
 docker-compose.yml
 ```
 
@@ -107,6 +108,40 @@ Resultado: 150 duplicados en la carga inicial y 6 en el delta, sin falsos positi
 de los habituales en los emails válidos (aparece al menos 10 veces). Si no, el email se deja
 vacío (el cliente sigue existiendo, pero no es contactable por correo).
 
+## Procesamiento (capa de consumo)
+
+`docker compose run --rm ingesta procesar` ejecuta `consume.refrescar()`, que se puede lanzar
+tras cada carga tantas veces como se quiera (mismo resultado).
+
+| Resultado | Tabla | Cómo se calcula |
+|---|---|---|
+| Hechos de venta | `fact_ventas` | Una fila por línea de pedido, con importes bruto, descuento, neto, coste y margen |
+| Visión 360 | `cliente_360` | Pedidos, importe, ticket medio, primera y última compra, recencia, categoría y canal predominantes, segmento |
+| Segmentación RFM | `cliente_rfm` + `segmento` | Notas R, F y M de 1 a 5 por quintiles; segmento = primera regla de `segmento` que se cumple |
+| Recomendaciones | `recomendacion` | 3 por cliente: los más vendidos de su categoría favorita que aún no ha comprado |
+| Audiencia | `audiencia_campana` | Solo consentimiento "sí" y email válido, con contacto, país, segmento y recomendación |
+
+**Hipótesis de negocio**
+
+1. Solo cuentan como venta los pedidos **entregados** (configurable en `core.estado_pedido.cuenta_como_venta`).
+2. Pendientes, cancelados y devueltos no cuentan en importes ni frecuencia. Los pendientes son
+   de las 3 últimas semanas y el 29 % de los ya resueltos acabó cancelado. Las devoluciones son
+   de pedido completo (las cantidades negativas eran errores, no devoluciones parciales).
+3. La recencia se mide contra la fecha del último pedido cargado (14/10/2026), no contra "hoy":
+   el resultado es reproducible.
+4. Periodo: todo el histórico (octubre 2024 a octubre 2026).
+5. Los pedidos de cliente desconocido (-1) cuentan en los totales, no en métricas por cliente.
+6. Categoría predominante = la de más importe; canal predominante = el de más pedidos.
+7. Notas RFM por quintiles entre los clientes con compras; los empates reciben la misma nota.
+8. Segmentos (por orden): Campeones (R≥4, F≥4), Leales (R=3, F≥4), Nuevos (1 pedido en 90 días),
+   Prometedores (R≥4), En riesgo (R≤2, F≥3), Hibernando (R≤2, F≤2), Necesitan atención (resto)
+   y Sin compras. Las reglas están en la tabla `segmento`: cambiar un criterio es cambiar una fila.
+9. Recomendación por afinidad de categoría, porque es explicable, se calcula en SQL y escala.
+   Sin compras o sin candidatos suficientes: los más vendidos del catálogo. Evolución natural:
+   co-compra ("quien compró X también compró Y").
+10. Audiencia: solo consentimiento explícito; el consentimiento desconocido queda fuera.
+
+
 ## Pruebas
 
 Sobre una base de datos **sin datos cargados** (usa ids fijos):
@@ -128,7 +163,7 @@ Se generarón con dbdiagram.io.
 
 | Decisión | Motivo |
 |---|---|
-| PostgreSQL, 4 esquemas (staging, core, consumo, control) | Separar dato de origen, depurado y de consumo; trazabilidad |
+| PostgreSQL, 4 esquemas (staging, core, consume, control) | Separar dato de origen, depurado y de consume; trazabilidad |
 | Clave sustituta + id del ERP con UNIQUE | Independencia del ERP, trazabilidad y base de los upserts |
 | Cliente en 3 tablas (identidad, ids ERP, versiones SCD2) | Deduplicación sin perder ids y historial del consentimiento |
 | Historial de estados de pedido | El delta solo cambia estados; no se pierde la evolución |
@@ -146,4 +181,8 @@ Se generarón con dbdiagram.io.
 | Duplicado = nombre normalizado + teléfono | El email cambia con facilidad; el teléfono identifica a la persona. 156 casos, 0 falsos positivos |
 | Deduplicar en cada carga, no al final | Si el delta cambia el teléfono, a posteriori ya no coincidirían |
 | Prevalece la ficha más antigua; la otra aporta pedidos y huecos | La duplicada suele llevar erratas; los cambios posteriores entran por el historial |
-| Consentimiento: si alguna ficha dice "no", es "no" | Prudencia ante el riesgo legal de contactar sin permiso |
+| Consentimiento: si alguna ficha dice "no", es "no" | Prudencia ante el riesgo legal de contactar sin permiso | 
+Venta = pedido entregado; recencia contra la fecha del último pedido | Métricas sin ventas dudosas y resultado reproducible |
+| Reglas de segmento en una tabla | Marketing puede ajustar criterios sin tocar código |
+| Recomendación por categoría favorita | Explicable y barata; la co-compra queda como evolución |
+| Audiencia solo con consentimiento explícito y email | Cumplimiento: 2.514 de 5.120 clientes son contactables |

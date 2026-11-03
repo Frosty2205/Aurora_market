@@ -1,0 +1,67 @@
+# Evidencia del procesamiento · 2026-11-03 11:46
+
+Procesamiento de la capa de consume:
+  fecha de referencia: 2026-10-14                              
+  consume.cliente_360                                      5120
+  consume.cliente_rfm                                      4573
+  consume.audiencia_campana (GENERAL_20261014)             2514
+  consume.recomendacion                                   15360
+  consume.fact_ventas                                    106026
+
+  segmento              clientes      %  importe (€)  en audiencia
+  Campeones                 1117   21.8      4625987           550
+  Leales                     366    7.1      1102855           175
+  Nuevos                     153    3.0        37444            81
+  Prometedores               651   12.7       591953           318
+  En riesgo                  502    9.8       895054           246
+  Hibernando                1325   25.9       661161           666
+  Necesitan atención         459    9.0       413499           220
+  Sin compras                547   10.7            0           258
+
+## Reglas de los segmentos (consume.segmento)
+ prioridad |       nombre       |            criterio            |                      accion_recomendada                      
+-----------+--------------------+--------------------------------+--------------------------------------------------------------
+         1 | Campeones          | R >= 4 y F >= 4                | Fidelizar: novedades, acceso anticipado, programa VIP.
+         2 | Leales             | R = 3 y F >= 4                 | Venta cruzada y programa de puntos.
+         3 | Nuevos             | 1 pedido y recencia <= 90 días | Bienvenida y incentivo para la segunda compra.
+         4 | Prometedores       | R >= 4                         | Aumentar la frecuencia con ofertas de su categoría favorita.
+         5 | En riesgo          | R <= 2 y F >= 3                | Reactivación con oferta personalizada.
+         6 | Hibernando         | R <= 2 y F <= 2                | Campaña de bajo coste o pausa de envíos.
+         7 | Necesitan atención | Resto de clientes con compras  | Recordatorio con su categoría favorita.
+        99 | Sin compras        | 0 pedidos entregados           | Primera compra con los productos más vendidos.
+(8 rows)
+
+## Ejemplo: Nuria Rubio Muñoz (C000784 + C005101 fusionados)
+ num_pedidos | importe_total | ticket_medio | fecha_primera_compra | fecha_ultima_compra | recencia_dias | categoria_principal | canal_principal | r_score | f_score | m_score | segmento  | consentimiento_marketing 
+-------------+---------------+--------------+----------------------+---------------------+---------------+---------------------+-----------------+---------+---------+---------+-----------+--------------------------
+          14 |       4360.51 |       311.47 | 2024-12-22           | 2026-05-23          |           144 | Electrónica         | Web             |       2 |       5 |       5 | En riesgo | f
+(1 row)
+
+ ranking |       producto        |  categoria  |                      motivo                      
+---------+-----------------------+-------------+--------------------------------------------------
+       1 | Smart home Orbe 125   | Electrónica | Top ventas en Electrónica, su categoría favorita
+       2 | Audio Terra 894       | Electrónica | Top ventas en Electrónica, su categoría favorita
+       3 | Informática Norte 665 | Electrónica | Top ventas en Electrónica, su categoría favorita
+(3 rows)
+
+Consentimiento = false: Nuria NO aparece en la audiencia de campaña.
+
+## Muestra de la audiencia de campaña (consume.audiencia_campana)
+    nombre_completo     |             email              |   pais   |      segmento      |  producto_recomendado  | categoria_recomendada | consentimiento_marketing 
+------------------------+--------------------------------+----------+--------------------+------------------------+-----------------------+--------------------------
+ Paula Muñoz Molina     | paula.munoz3644@empresa.com    | Francia  | Prometedores       | Textil hogar Vento 391 | Hogar                 | t
+ Daniel Álvarez Ruiz    | daniel.alvarez5032@empresa.com | Portugal | Campeones          | Construcción Vento 516 | Juguetes              | t
+ Elena García Fernández | elena.garcia8746@outlook.com   | Italia   | Campeones          | Textil hogar Vento 391 | Hogar                 | t
+ Claudia Moreno Pérez   | claudia.moreno1070@gmail.com   | España   | Hibernando         | Abrigos Norte 283      | Moda                  | t
+ Óscar Ortega Romero    | oscar.ortega314@outlook.com    | Italia   | Necesitan atención | Textil hogar Vento 391 | Hogar                 | t
+ Iker Martínez Gil      | iker.martinez324@gmail.com     | Italia   | Campeones          | Running Zenit 234      | Deporte               | t
+ Javier Moreno Pérez    | javier.moreno646@empresa.com   | España   | Hibernando         | Construcción Vento 516 | Juguetes              | t
+ Nuria Díaz Gil         | nuria.diaz3788@empresa.com     | Portugal | Necesitan atención | Abrigos Norte 283      | Moda                  | t
+(8 rows)
+
+## Comprobaciones (deben dar 0)
+ audiencia_sin_permiso | recomendaciones_ya_compradas | descuadre_360_vs_hechos 
+-----------------------+------------------------------+-------------------------
+                     0 |                            0 |                    0.00
+(1 row)
+
