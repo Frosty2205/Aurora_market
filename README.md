@@ -28,6 +28,7 @@ evidencias/
   evidencia_procesamiento.txt   Resultado del procesamiento, segmentos, ejemplo y comprobaciones
 tests/
   test_restricciones.sql    20 pruebas de restricciones (se deshacen al terminar)
+  consultas_evidencia.sql   Consultas de solo lectura que generan parte de las evidencias
 diagramas/
   core.dbml, consume.dbml, completo.dbml   Para dbdiagram.io
   diagrama_logico_completo.png, diagrama_logico_consume.png, diagrama_logico_core.png   En versión imagen de lo que da de los dbml
@@ -199,6 +200,14 @@ Comprueba que el modelo acepta los casos válidos (cliente/producto desconocido,
 corregida, producto sin precio) y rechaza los inválidos (cantidad 0, descuento > 100 %,
 duplicados, claves foráneas rotas, dos versiones actuales de un cliente, email mal formado,
 fichero cargado dos veces, importes incoherentes en la tabla de hechos).
+
+## Consultas de comprobación (evidencias)
+
+Las secciones de `evidencias/` que no son salida directa de un comando (registro de ejecuciones, cuarentena, totales en `core`, historiales, reglas de segmentos, ejemplo de Nuria, muestra de la audiencia y comprobaciones finales) salen de consultas de solo lectura. No forman parte del pipeline: sirven para enseñar su resultado. Se pueden repetir tras `inicial`, `delta` y `procesar`:
+
+```bash
+docker exec -i aurora_market_db psql -U aurora -d aurora_market < tests/consultas_evidencia.sql
+```
 
 ## Diagramas
 
